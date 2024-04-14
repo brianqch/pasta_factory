@@ -12,48 +12,54 @@
 #include "collision/sphere.h"
 #include "misc/camera_info.h"
 #include "misc/file_utils.h"
-// Needed to generate stb_image binaries. Should only define in exactly one source file importing stb_image.h.
+// Needed to generate stb_image binaries. Should only define in exactly one
+// source file importing stb_image.h.
 #define STB_IMAGE_IMPLEMENTATION
 #include "misc/stb_image.h"
 
 using namespace nanogui;
 using namespace std;
 
-Vector3D load_texture(int frame_idx, GLuint handle, const char* where) {
+Vector3D load_texture(int frame_idx, GLuint handle, const char *where) {
   Vector3D size_retval;
-  
-  if (strlen(where) == 0) return size_retval;
-  
+
+  if (strlen(where) == 0)
+    return size_retval;
+
   glActiveTexture(GL_TEXTURE0 + frame_idx);
   glBindTexture(GL_TEXTURE_2D, handle);
-  
-  
+
   int img_x, img_y, img_n;
-  unsigned char* img_data = stbi_load(where, &img_x, &img_y, &img_n, 3);
+  unsigned char *img_data = stbi_load(where, &img_x, &img_y, &img_n, 3);
   size_retval.x = img_x;
   size_retval.y = img_y;
   size_retval.z = img_n;
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_x, img_y, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, img_data);
   stbi_image_free(img_data);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  
+
   return size_retval;
 }
 
-void load_cubemap(int frame_idx, GLuint handle, const std::vector<std::string>& file_locs) {
+void load_cubemap(int frame_idx, GLuint handle,
+                  const std::vector<std::string> &file_locs) {
   glActiveTexture(GL_TEXTURE0 + frame_idx);
   glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
   for (int side_idx = 0; side_idx < 6; ++side_idx) {
-    
+
     int img_x, img_y, img_n;
-    unsigned char* img_data = stbi_load(file_locs[side_idx].c_str(), &img_x, &img_y, &img_n, 3);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side_idx, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
+    unsigned char *img_data =
+        stbi_load(file_locs[side_idx].c_str(), &img_x, &img_y, &img_n, 3);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side_idx, 0, GL_RGB, img_x,
+                 img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
     stbi_image_free(img_data);
-    std::cout << "Side " << side_idx << " has dimensions " << img_x << ", " << img_y << std::endl;
+    std::cout << "Side " << side_idx << " has dimensions " << img_x << ", "
+              << img_y << std::endl;
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -69,63 +75,72 @@ void ClothSimulator::load_textures() {
   glGenTextures(1, &m_gl_texture_3);
   glGenTextures(1, &m_gl_texture_4);
   glGenTextures(1, &m_gl_cubemap_tex);
-  
-  m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/texture_1.png").c_str());
-  m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
-  m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
-  m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
-  
-  std::cout << "Texture 1 loaded with size: " << m_gl_texture_1_size << std::endl;
-  std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
-  std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size << std::endl;
-  std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size << std::endl;
-  
+
+  m_gl_texture_1_size = load_texture(
+      1, m_gl_texture_1, (m_project_root + "/textures/texture_1.png").c_str());
+  m_gl_texture_2_size = load_texture(
+      2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
+  m_gl_texture_3_size = load_texture(
+      3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
+  m_gl_texture_4_size = load_texture(
+      4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
+
+  std::cout << "Texture 1 loaded with size: " << m_gl_texture_1_size
+            << std::endl;
+  std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size
+            << std::endl;
+  std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size
+            << std::endl;
+  std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size
+            << std::endl;
+
   std::vector<std::string> cubemap_fnames = {
-    m_project_root + "/textures/cube/posx.jpg",
-    m_project_root + "/textures/cube/negx.jpg",
-    m_project_root + "/textures/cube/posy.jpg",
-    m_project_root + "/textures/cube/negy.jpg",
-    m_project_root + "/textures/cube/posz.jpg",
-    m_project_root + "/textures/cube/negz.jpg"
-  };
-  
+      m_project_root + "/textures/cube/posx.jpg",
+      m_project_root + "/textures/cube/negx.jpg",
+      m_project_root + "/textures/cube/posy.jpg",
+      m_project_root + "/textures/cube/negy.jpg",
+      m_project_root + "/textures/cube/posz.jpg",
+      m_project_root + "/textures/cube/negz.jpg"};
+
   load_cubemap(5, m_gl_cubemap_tex, cubemap_fnames);
   std::cout << "Loaded cubemap texture" << std::endl;
 }
 
 void ClothSimulator::load_shaders() {
   std::set<std::string> shader_folder_contents;
-  bool success = FileUtils::list_files_in_directory(m_project_root + "/shaders", shader_folder_contents);
+  bool success = FileUtils::list_files_in_directory(m_project_root + "/shaders",
+                                                    shader_folder_contents);
   if (!success) {
     std::cout << "Error: Could not find the shaders folder!" << std::endl;
   }
-  
+
   std::string std_vert_shader = m_project_root + "/shaders/Default.vert";
-  
-  for (const std::string& shader_fname : shader_folder_contents) {
+
+  for (const std::string &shader_fname : shader_folder_contents) {
     std::string file_extension;
     std::string shader_name;
-    
+
     FileUtils::split_filename(shader_fname, shader_name, file_extension);
-    
+
     if (file_extension != "frag") {
       std::cout << "Skipping non-shader file: " << shader_fname << std::endl;
       continue;
     }
-    
+
     std::cout << "Found shader file: " << shader_fname << std::endl;
-    
+
     // Check if there is a proper .vert shader or not for it
     std::string vert_shader = std_vert_shader;
-    std::string associated_vert_shader_path = m_project_root + "/shaders/" + shader_name + ".vert";
+    std::string associated_vert_shader_path =
+        m_project_root + "/shaders/" + shader_name + ".vert";
     if (FileUtils::file_exists(associated_vert_shader_path)) {
       vert_shader = associated_vert_shader_path;
     }
-    
+
     std::shared_ptr<GLShader> nanogui_shader = make_shared<GLShader>();
     nanogui_shader->initFromFiles(shader_name, vert_shader,
                                   m_project_root + "/shaders/" + shader_fname);
-    
+
     // Special filenames are treated a bit differently
     ShaderTypeHint hint;
     if (shader_name == "Wireframe") {
@@ -138,13 +153,13 @@ void ClothSimulator::load_shaders() {
       hint = ShaderTypeHint::PHONG;
       std::cout << "Type: Custom" << std::endl;
     }
-    
+
     UserShader user_shader(shader_name, nanogui_shader, hint);
-    
+
     shaders.push_back(user_shader);
     shaders_combobox_names.push_back(shader_name);
   }
-  
+
   // Assuming that it's there, use "Wireframe" by default
   for (size_t i = 0; i < shaders_combobox_names.size(); ++i) {
     if (shaders_combobox_names[i] == "Wireframe") {
@@ -155,9 +170,9 @@ void ClothSimulator::load_shaders() {
 }
 
 ClothSimulator::ClothSimulator(std::string project_root, Screen *screen)
-: m_project_root(project_root) {
+    : m_project_root(project_root) {
   this->screen = screen;
-  
+
   this->load_shaders();
   this->load_textures();
 
@@ -175,16 +190,23 @@ ClothSimulator::~ClothSimulator() {
   glDeleteTextures(1, &m_gl_texture_4);
   glDeleteTextures(1, &m_gl_cubemap_tex);
 
-  if (cloth_objects) delete cloth_objects;
-  if (cp) delete cp;
-  if (collision_objects) delete collision_objects;
+  if (cloth_objects)
+    delete cloth_objects;
+  if (cp)
+    delete cp;
+  if (collision_objects)
+    delete collision_objects;
 }
 
-void ClothSimulator::loadCloths(vector<Cloth *> *cloth_objects) { this->cloth_objects = cloth_objects;}
+void ClothSimulator::loadCloths(vector<Cloth *> *cloth_objects) {
+  this->cloth_objects = cloth_objects;
+}
 
 void ClothSimulator::loadClothParameters(ClothParameters *cp) { this->cp = cp; }
 
-void ClothSimulator::loadCollisionObjects(vector<CollisionObject *> *objects) { this->collision_objects = objects; }
+void ClothSimulator::loadCollisionObjects(vector<CollisionObject *> *objects) {
+  this->collision_objects = objects;
+}
 
 /**
  * Initializes the cloth simulation and spawns a new thread to separate
@@ -208,8 +230,8 @@ void ClothSimulator::init() {
 
   Vector3D avg_pm_position(0, 0, 0);
 
-  Cloth *cloth = (* cloth_objects)[0];
-  
+  Cloth *cloth = (*cloth_objects)[0];
+
   for (auto &pm : (cloth->point_masses)) {
     avg_pm_position += pm.position / cloth->point_masses.size();
   }
@@ -245,27 +267,27 @@ void ClothSimulator::drawContents() {
 
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
-
-    vector<Cloth*> cloth_obj_queue;
-    cloth_obj_queue.insert(cloth_obj_queue.end(), cloth_objects->begin(), cloth_objects->end());
-
-    while (cloth_obj_queue.size() > 0) {
-      Cloth* cloth = cloth_obj_queue.front();
-      // cout << "This my size cuhh: " << cloth_obj_queue.size();
-      //       cout << "This my width cuhhh: " << cloth->width << "\n";
-      // cout << "YURRRRRRRRRRR" << cloth->width;
-      cloth_obj_queue.erase(cloth_obj_queue.begin());
-
+    // cout << "hi";
+    for (Cloth *cloth : *cloth_objects) {
+      // Simulate cloth dynamics
       for (int i = 0; i < simulation_steps; i++) {
-        cloth->simulate(frames_per_sec, simulation_steps, cp, external_accelerations, collision_objects, cloth_obj_queue);
-        cloth->split_cloth(cloth_obj_queue);
+        cloth->simulate(frames_per_sec, simulation_steps, cp,
+                        external_accelerations, collision_objects,
+                        *cloth_objects);
+
+        // Check for contact and split cloth if necessary
+        // if (cloth->contactDetected) {
+        //   cloth->split_cloth(*cloth_objects); // Perform cloth splitting
+        //   logic cloth->contactDetected = false; // Reset contact detection
+        //   flag"
+        // }
       }
     }
   }
 
   // Bind the active shader
 
-  const UserShader& active_shader = shaders[active_shader_idx];
+  const UserShader &active_shader = shaders[active_shader_idx];
 
   GLShader &shader = *active_shader.nanogui_shader;
   shader.bind();
@@ -296,30 +318,47 @@ void ClothSimulator::drawContents() {
     }
     break;
   case PHONG:
+    // cloth_objects_queue.clear();
+    vector<Cloth *> cloth_objects_queue;
+
     for (Cloth *cloth : *cloth_objects) {
-    // Others
-    Vector3D cam_pos = camera.position();
-    shader.setUniform("u_color", color, false);
-    shader.setUniform("u_cam_pos", Vector3f(cam_pos.x, cam_pos.y, cam_pos.z), false);
-    shader.setUniform("u_light_pos", Vector3f(0.5, 2, 2), false);
-    shader.setUniform("u_light_intensity", Vector3f(3, 3, 3), false);
-    shader.setUniform("u_texture_1_size", Vector2f(m_gl_texture_1_size.x, m_gl_texture_1_size.y), false);
-    shader.setUniform("u_texture_2_size", Vector2f(m_gl_texture_2_size.x, m_gl_texture_2_size.y), false);
-    shader.setUniform("u_texture_3_size", Vector2f(m_gl_texture_3_size.x, m_gl_texture_3_size.y), false);
-    shader.setUniform("u_texture_4_size", Vector2f(m_gl_texture_4_size.x, m_gl_texture_4_size.y), false);
-    // Textures
-    shader.setUniform("u_texture_1", 1, false);
-    shader.setUniform("u_texture_2", 2, false);
-    shader.setUniform("u_texture_3", 3, false);
-    shader.setUniform("u_texture_4", 4, false);
-    
-    shader.setUniform("u_normal_scaling", m_normal_scaling, false);
-    shader.setUniform("u_height_scaling", m_height_scaling, false);
-    
-    shader.setUniform("u_texture_cubemap", 5, false);
-    drawPhong(shader, cloth);
-    break;
+      cloth_objects_queue.push_back(cloth);
+      // cout << cloth << "\n";
     }
+
+    for (Cloth *cloth : cloth_objects_queue) {
+      // Others
+      Vector3D cam_pos = camera.position();
+      shader.setUniform("u_color", color, false);
+      shader.setUniform("u_cam_pos", Vector3f(cam_pos.x, cam_pos.y, cam_pos.z),
+                        false);
+      shader.setUniform("u_light_pos", Vector3f(0.5, 2, 2), false);
+      shader.setUniform("u_light_intensity", Vector3f(3, 3, 3), false);
+      shader.setUniform("u_texture_1_size",
+                        Vector2f(m_gl_texture_1_size.x, m_gl_texture_1_size.y),
+                        false);
+      shader.setUniform("u_texture_2_size",
+                        Vector2f(m_gl_texture_2_size.x, m_gl_texture_2_size.y),
+                        false);
+      shader.setUniform("u_texture_3_size",
+                        Vector2f(m_gl_texture_3_size.x, m_gl_texture_3_size.y),
+                        false);
+      shader.setUniform("u_texture_4_size",
+                        Vector2f(m_gl_texture_4_size.x, m_gl_texture_4_size.y),
+                        false);
+      // Textures
+      shader.setUniform("u_texture_1", 1, false);
+      shader.setUniform("u_texture_2", 2, false);
+      shader.setUniform("u_texture_3", 3, false);
+      shader.setUniform("u_texture_4", 4, false);
+
+      shader.setUniform("u_normal_scaling", m_normal_scaling, false);
+      shader.setUniform("u_height_scaling", m_height_scaling, false);
+
+      shader.setUniform("u_texture_cubemap", 5, false);
+      drawPhong(shader, cloth);
+    }
+    break;
   }
 
   for (CollisionObject *co : *collision_objects) {
@@ -372,10 +411,11 @@ void ClothSimulator::drawWireframe(GLShader &shader, Cloth *cloth) {
     si += 2;
   }
 
-  //shader.setUniform("u_color", nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f), false);
+  // shader.setUniform("u_color", nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f),
+  // false);
   shader.uploadAttrib("in_position", positions, false);
   // Commented out: the wireframe shader does not have this attribute
-  //shader.uploadAttrib("in_normal", normals);
+  // shader.uploadAttrib("in_normal", normals);
 
   shader.drawArray(GL_LINES, 0, num_springs * 2);
 }
@@ -431,23 +471,22 @@ void ClothSimulator::drawPhong(GLShader &shader, Cloth *cloth) {
     Vector3D n2 = tri->pm2->normal();
     Vector3D n3 = tri->pm3->normal();
 
-    positions.col(i * 3    ) << p1.x, p1.y, p1.z, 1.0;
+    positions.col(i * 3) << p1.x, p1.y, p1.z, 1.0;
     positions.col(i * 3 + 1) << p2.x, p2.y, p2.z, 1.0;
     positions.col(i * 3 + 2) << p3.x, p3.y, p3.z, 1.0;
 
-    normals.col(i * 3    ) << n1.x, n1.y, n1.z, 0.0;
+    normals.col(i * 3) << n1.x, n1.y, n1.z, 0.0;
     normals.col(i * 3 + 1) << n2.x, n2.y, n2.z, 0.0;
     normals.col(i * 3 + 2) << n3.x, n3.y, n3.z, 0.0;
-    
-    uvs.col(i * 3    ) << tri->uv1.x, tri->uv1.y;
+
+    uvs.col(i * 3) << tri->uv1.x, tri->uv1.y;
     uvs.col(i * 3 + 1) << tri->uv2.x, tri->uv2.y;
     uvs.col(i * 3 + 2) << tri->uv3.x, tri->uv3.y;
-    
-    tangents.col(i * 3    ) << 1.0, 0.0, 0.0, 1.0;
+
+    tangents.col(i * 3) << 1.0, 0.0, 0.0, 1.0;
     tangents.col(i * 3 + 1) << 1.0, 0.0, 0.0, 1.0;
     tangents.col(i * 3 + 2) << 1.0, 0.0, 0.0, 1.0;
   }
-
 
   shader.uploadAttrib("in_position", positions, false);
   shader.uploadAttrib("in_normal", normals, false);
@@ -616,6 +655,21 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
         is_paused = true;
       }
       break;
+    case 's':
+    case 'S':
+      cout << cloth_objects->size();
+
+      vector<Cloth *> cloth_objects_queue;
+
+      for (Cloth *cloth : *cloth_objects) {
+        cloth_objects_queue.push_back(cloth);
+      }
+
+      for (Cloth *cloth : cloth_objects_queue) {
+        cloth->split_cloth(*cloth_objects);
+      }
+      cout << '\n';
+      break;
     }
   }
 
@@ -641,7 +695,7 @@ bool ClothSimulator::resizeCallbackEvent(int width, int height) {
 
 void ClothSimulator::initGUI(Screen *screen) {
   Window *window;
-  
+
   window = new Window(screen, "Simulation");
   window->setPosition(Vector2i(default_window_size(0) - 245, 15));
   window->setLayout(new GroupLayout(15, 6, 14, 5));
@@ -694,7 +748,8 @@ void ClothSimulator::initGUI(Screen *screen) {
     fb->setValue(cp->density / 10);
     fb->setUnits("g/cm^2");
     fb->setSpinnable(true);
-    fb->setCallback([this](float value) { cp->density = (double)(value * 10); });
+    fb->setCallback(
+        [this](float value) { cp->density = (double)(value * 10); });
 
     new Label(panel, "ks :", "sans-bold");
 
@@ -816,7 +871,7 @@ void ClothSimulator::initGUI(Screen *screen) {
     fb->setSpinnable(true);
     fb->setCallback([this](float value) { gravity.z = value; });
   }
-  
+
   window = new Window(screen, "Appearance");
   window->setPosition(Vector2i(15, 15));
   window->setLayout(new GroupLayout(15, 6, 14, 5));
@@ -824,12 +879,10 @@ void ClothSimulator::initGUI(Screen *screen) {
   // Appearance
 
   {
-    
-    
+
     ComboBox *cb = new ComboBox(window, shaders_combobox_names);
     cb->setFontSize(14);
-    cb->setCallback(
-        [this, screen](int idx) { active_shader_idx = idx; });
+    cb->setCallback([this, screen](int idx) { active_shader_idx = idx; });
     cb->setSelectedIndex(active_shader_idx);
   }
 

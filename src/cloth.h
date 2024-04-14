@@ -55,7 +55,7 @@ struct Cloth {
 
   void reset();
   void buildClothMesh();
-  void split_cloth(vector<Cloth*> cloth_obj_queue);
+  void split_cloth(vector<Cloth*> &cloth_objects);
   void build_springs();
 
   void build_spatial_map();
@@ -68,6 +68,7 @@ struct Cloth {
   int num_width_points;
   int num_height_points;
   double thickness;
+  bool contactDetected;
   e_orientation orientation;
 
   // Cloth components

@@ -22,6 +22,7 @@ Cloth::Cloth(double width, double height, int num_width_points,
   this->num_width_points = num_width_points;
   this->num_height_points = num_height_points;
   this->thickness = thickness;
+  this->contactDetected = false;
 
   buildGrid();
   buildClothMesh();
@@ -455,31 +456,78 @@ void Cloth::buildClothMesh() {
   this->clothMesh = clothMesh;
 }
 
-void Cloth::split_cloth(vector<Cloth*> cloth_obj_queue) {
-    // Find the midpoint of the cloth
-    int midpoint = num_width_points / 2;
+void Cloth::split_cloth(vector<Cloth*> &cloth_objects) {
 
-    // Create a new cloth object for the second half with adjusted parameters
-    Cloth* second_half = new Cloth(width, height, num_width_points - midpoint, num_height_points, thickness);
-    second_half->orientation = orientation;
+  int midpoint;
+  if (orientation == HORIZONTAL) {
+      midpoint = num_height_points / 2;
+  } else {
+      midpoint = num_width_points / 2;
+  }
 
-    // Update the point masses and springs of the current cloth
-    point_masses.erase(point_masses.begin() + midpoint * num_height_points, point_masses.end());
-    // point_masses.clear();
-    // springs.clear();
+    // Split the cloth into two halves
+    Cloth* cloth1 = new Cloth();
+    Cloth* cloth2 = new Cloth();
 
-    // Rebuild the cloth grid, point masses, and springs for the current cloth
-    // buildGrid();c
-    // cout << "NUMWIDTH CURR" << num_width_points;
-    // Rebuild the cloth grid, point masses, and springs for the second half cloth
-    // this->num_width_points = num_width_points - midpoint;
-    // buildGrid();
-    // second_half->buildGrid();
-    // cout << "NUMWIDTH" << second_half->num_width_points;
-    second_half->build_springs();
+    // Transfer properties from the original cloth
+    cloth1->width = width;
+    cloth1->height = height / 2.0;
+    cloth1->num_width_points = (orientation == VERTICAL) ? num_width_points/2 : num_width_points;
+    cloth1->num_height_points = (orientation == HORIZONTAL) ? num_height_points / 2 : num_width_points;
+    cloth1->thickness = thickness;
 
-    // Update the cloth object queue with the second half cloth
-    // cloth_obj_queue.push_back(second_half);/
+    cloth2->width = width;
+    cloth2->height = height / 2.0;
+    cloth2->num_width_points = num_width_points;
+    cloth2->num_height_points = num_height_points / 2;
+    cloth2->thickness = thickness;
+
+    
+  int firsthalf = 0;
+  int secondhalf = 0;
+  
+  // Transfer point masses and their properties
+    for (int h = 0; h < num_height_points; h++) {
+        for (int w = 0; w < num_width_points; w++) {
+            PointMass& pm = point_masses[h * num_width_points + w];
+            if (( orientation == HORIZONTAL && h < midpoint) || ( orientation == VERTICAL && w < midpoint)) {
+                // Assign this point mass to cloth1
+                PointMass new_pm(pm.position, pm.pinned);
+                new_pm.last_position = pm.last_position;
+                new_pm.forces = pm.forces;
+                cloth1->point_masses.push_back(new_pm);
+                firsthalf++;
+            } else {
+                // // Assign this point mass to cloth2
+                PointMass new_pm(pm.position, pm.pinned);
+                new_pm.last_position = pm.last_position;
+                new_pm.forces = pm.forces;
+                cloth2->point_masses.push_back(new_pm);
+                secondhalf++;
+            }
+        }
+    }
+
+    cout << "First half: " << firsthalf << "\n";
+    cout << "Second half: " << secondhalf << "\n";
+
+    // Build springs for the new cloth objects
+
+    cloth1->build_springs();
+    cloth2->build_springs();
+
+
+    // Add the new cloth objects to the cloth_objects vector
+    auto it = find(cloth_objects.begin(), cloth_objects.end(), this);
+    if (it != cloth_objects.end()) {
+        cloth_objects.erase(it);
+    }
+
+    cloth1->buildClothMesh();
+    cloth2->buildClothMesh();
+
+    cloth_objects.push_back(cloth1);
+    cloth_objects.push_back(cloth2);
 }
 
 void Cloth::build_springs() {

@@ -590,54 +590,27 @@ int main(int argc, char **argv) {
     def_fname << "/scene/pinned2.json";
     file_to_load_from = def_fname.str();
   }
-  // bool success1 = loadObjectsFromFile(file_to_load_from, &cloth1, &cp, &objects, sphere_num_lat, sphere_num_lon);
-  // bool success = loadObjectsFromFile(file_to_load_from, &cloth, &cp, &objects, sphere_num_lat, sphere_num_lon);
-  // if (!success || !success1) {
-  //   std::cout << "Warn: Unable to load from file: " << file_to_load_from << std::endl;
-  // }
 
-  // Load objects for cloth
-  
-
-  // Load objects for cloth1
-  // Cloth cloth1; // Create a separate Cloth object for cloth1
-
-  // bool success1 = loadObjectsFromFile(file_to_load_from, &cloth1, &cp, &objects, sphere_num_lat, sphere_num_lon);
   vector<Cloth *> cloths;
   cloths.push_back(&cloth);
-  // cloths.push_back(&cloth1);
 
   bool success = loadObjectsFromFile(file_to_load_from, cloths, &cp, &objects, sphere_num_lat, sphere_num_lon);
   if (!success) {
       std::cout << "Warn: Unable to load from file: " << file_to_load_from << std::endl;
   }
-  // if (!success1) {
-  //     std::cout << "Warn: Unable to load from file: " << file_to_load_from << std::endl;
-  // }
+
 
   glfwSetErrorCallback(error_callback);
 
   createGLContexts();
 
-    // Cloth cloth1;
-  // cloth1.buildGrid();
-  // cloth1.buildClothMesh();
-
   // Initialize the Cloth object
   cloth.buildGrid();
   cloth.buildClothMesh();
 
-  // // Cloth cloth1;
-  // cloth1.buildGrid();
-  // cloth1.buildClothMesh();
-
-  // Final Project Task
-  // cloth.split_cloth();
   vector<Cloth *> cloth_objects;
 
   cloth_objects.push_back(&cloth);
-  // cloth_objects.push_back(&cloth1);
-
 
   // Initialize the ClothSimulator object
   app = new ClothSimulator(project_root, screen);
@@ -645,11 +618,6 @@ int main(int argc, char **argv) {
   app->loadClothParameters(&cp);
   app->loadCollisionObjects(&objects);
   app->init();
-
-  // Final Project Task
-  // cloth.split_cloth();
-
-  // Call this after all the widgets have been defined
 
   screen->setVisible(true);
   screen->performLayout();
