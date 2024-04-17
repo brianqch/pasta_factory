@@ -25,6 +25,8 @@ public:
   void loadCollisionObjects(vector<CollisionObject *> *objects);
   virtual bool isAlive();
   virtual void drawContents();
+  virtual void buildGlobalSpatialMap(vector<Cloth *> *cloth_objects);
+  virtual void globalCollision(Cloth* cloth);
 
   // Screen events
 
@@ -134,6 +136,9 @@ private:
   bool is_alive = true;
 
   Vector2i default_window_size = Vector2i(1024, 800);
+
+  // Global Spatial Hashing 
+  unordered_map<float, vector<PointMass *> *> global_map;
 
 };
 

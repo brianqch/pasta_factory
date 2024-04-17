@@ -51,7 +51,7 @@ struct Cloth {
 
   void simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
                 vector<Vector3D> external_accelerations,
-                vector<CollisionObject *> *collision_objects, vector<Cloth *> cloth_obj_queue);
+                vector<CollisionObject *> *collision_objects);
 
   void reset();
   void buildClothMesh();

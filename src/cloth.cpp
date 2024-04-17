@@ -135,7 +135,7 @@ void Cloth::buildGrid() {
 void Cloth::simulate(double frames_per_sec, double simulation_steps,
                      ClothParameters *cp,
                      vector<Vector3D> external_accelerations,
-                     vector<CollisionObject *> *collision_objects, vector<Cloth *> cloth_obj_queue) {
+                     vector<CollisionObject *> *collision_objects) {
   double mass =
       width * height * cp->density / num_width_points / num_height_points;
   double delta_t = 1.0f / frames_per_sec / simulation_steps;
@@ -473,19 +473,21 @@ void Cloth::split_cloth(vector<Cloth*> &cloth_objects) {
     cloth1->width = width;
     cloth1->height = height / 2.0;
     cloth1->num_width_points = (orientation == VERTICAL) ? num_width_points/2 : num_width_points;
-    cloth1->num_height_points = (orientation == HORIZONTAL) ? num_height_points / 2 : num_width_points;
+    cloth1->num_height_points = (orientation == HORIZONTAL) ? num_height_points / 2 : num_height_points;
     cloth1->thickness = thickness;
+    cloth1->orientation = orientation;
 
     cloth2->width = width;
     cloth2->height = height / 2.0;
-    cloth2->num_width_points = num_width_points;
-    cloth2->num_height_points = num_height_points / 2;
+    cloth2->num_width_points = (orientation == VERTICAL) ? num_width_points/2 : num_width_points;
+    cloth2->num_height_points = (orientation == HORIZONTAL) ? num_height_points / 2 : num_height_points;
     cloth2->thickness = thickness;
+    cloth2->orientation = orientation;
 
     
   int firsthalf = 0;
   int secondhalf = 0;
-  
+  cout << "Orientation: " << orientation << "\n";
   // Transfer point masses and their properties
     for (int h = 0; h < num_height_points; h++) {
         for (int w = 0; w < num_width_points; w++) {

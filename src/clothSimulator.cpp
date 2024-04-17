@@ -267,13 +267,15 @@ void ClothSimulator::drawContents() {
 
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
-    // cout << "hi";
+    // buildGlobalSpatialMap(cloth_objects);
     for (Cloth *cloth : *cloth_objects) {
-      // Simulate cloth dynamics
       for (int i = 0; i < simulation_steps; i++) {
+        // globalCollision(cloth);
+
         cloth->simulate(frames_per_sec, simulation_steps, cp,
-                        external_accelerations, collision_objects,
-                        *cloth_objects);
+                        external_accelerations, collision_objects);  
+
+        
 
         // Check for contact and split cloth if necessary
         // if (cloth->contactDetected) {
@@ -283,7 +285,9 @@ void ClothSimulator::drawContents() {
         // }
       }
     }
+
   }
+
 
   // Bind the active shader
 
@@ -364,6 +368,93 @@ void ClothSimulator::drawContents() {
   for (CollisionObject *co : *collision_objects) {
     co->render(shader);
   }
+}
+
+// Build Global Spatial Map
+void ClothSimulator::buildGlobalSpatialMap(vector<Cloth *> *cloth_objects) {
+  for (const auto &entry : global_map) {
+    delete (entry.second);
+  }
+  global_map.clear();
+
+  for (Cloth* cloth : *cloth_objects) {
+
+    // TODO (Part 4): Build a spatial map out of all of the point masses.
+
+    for (PointMass &pm : cloth->point_masses) {
+      Vector3D position = pm.position;
+      float f = cloth->hash_position(position);
+
+      if (!global_map[f]) {
+        global_map[f] = new vector<PointMass *>();
+      }
+      global_map[f]->push_back(&pm);
+    }
+  }
+}
+
+// Global Collision
+void ClothSimulator::globalCollision(Cloth* cloth) {
+  // buildGlobalSpatialMap(cloth_objects);
+
+  for (PointMass &pm : cloth->point_masses) {
+      float hashedPosition = cloth->hash_position(pm.position);
+      Vector3D corrVector = Vector3D();
+      int num = 0;
+      if (global_map[hashedPosition]) {
+        for (PointMass *candidate : *global_map[hashedPosition]) {
+          // Skip itself
+          if (candidate == &pm)
+            continue;
+          Vector3D diff_vector = pm.position - candidate->position;
+          if (diff_vector.norm() <= 2 * cloth->thickness) {
+            Vector3D correction = diff_vector.unit() * (2 * cloth->thickness - diff_vector.norm());
+            corrVector += correction;
+            num += 1;
+          }
+        }
+      }
+      if (num > 0) {
+        corrVector /= num;
+        corrVector /= simulation_steps;
+        pm.position += corrVector;
+      }
+
+      // TODO (Part 3): Handle collisions with other primitives.
+      for (CollisionObject *obj : *collision_objects) {
+        obj->collide(pm);
+      }
+    }
+  // for (Cloth* cloth : *cloth_objects){
+  //   for (PointMass &pm : cloth->point_masses) {
+  //     float hashedPosition = cloth->hash_position(pm.position);
+  //     Vector3D corrVector = Vector3D();
+  //     int num = 0;
+  //     if (global_map[hashedPosition]) {
+  //       for (PointMass *candidate : *global_map[hashedPosition]) {
+  //         // Skip itself
+  //         if (candidate == &pm)
+  //           continue;
+  //         Vector3D diff_vector = pm.position - candidate->position;
+  //         if (diff_vector.norm() <= 2 * cloth->thickness) {
+  //           Vector3D correction = diff_vector.unit() * (2 * cloth->thickness - diff_vector.norm());
+  //           corrVector += correction;
+  //           num += 1;
+  //         }
+  //       }
+  //     }
+  //     if (num > 0) {
+  //       corrVector /= num;
+  //       corrVector /= simulation_steps;
+  //       pm.position += corrVector;
+  //     }
+
+  //     // TODO (Part 3): Handle collisions with other primitives.
+  //     // for (CollisionObject *obj : *collision_objects) {
+  //     //   obj->collide(pm);
+  //     // }
+  //   }
+  // }
 }
 
 // Added cloth parameter to take in
