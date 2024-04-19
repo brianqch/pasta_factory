@@ -254,19 +254,26 @@ bool loadObjectsFromFile(string filename, vector<Cloth *> * cloths, ClothParamet
       if (it_xOffset != object.end()) {
           vector<double> points = *it_xOffset;
           xOffset = points;
+      } else {
+          xOffset.push_back(0.0);
       }
 
       auto it_yOffset = object.find("yOffset");
       if (it_yOffset != object.end()) {
           vector<double> points = *it_yOffset;
           yOffset = points;
+      } else {
+          yOffset.push_back(0.0);
       }
 
       auto it_zOffset = object.find("zOffset");
       if (it_zOffset != object.end()) {
           vector<double> points = *it_zOffset;
           zOffset = points;
+      } else {
+          zOffset.push_back(0.0);
       }
+
       if (xOffset.size() != yOffset.size() || yOffset.size() != zOffset.size()) {
           incompleteObjectError("cloth", "Offsets Unequal");
       }
