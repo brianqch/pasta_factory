@@ -267,24 +267,24 @@ void ClothSimulator::drawContents() {
 
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
-    // buildGlobalSpatialMap(cloth_objects);
-    for (Cloth *cloth : *cloth_objects) {
+    
+    
       for (int i = 0; i < simulation_steps; i++) {
-        // globalCollision(cloth);
-
-        cloth->simulate(frames_per_sec, simulation_steps, cp,
+          for (Cloth* cloth : *cloth_objects) {
+            cloth->simulate(frames_per_sec, simulation_steps, cp,
                         external_accelerations, collision_objects);  
-
-        
-
         // Check for contact and split cloth if necessary
         // if (cloth->contactDetected) {
         //   cloth->split_cloth(*cloth_objects); // Perform cloth splitting
         //   logic cloth->contactDetected = false; // Reset contact detection
         //   flag"
         // }
+          }
+          buildGlobalSpatialMap(cloth_objects);
+          for (Cloth* cloth : *cloth_objects) {
+              globalCollision(cloth);
+          }
       }
-    }
 
   }
 
@@ -395,7 +395,7 @@ void ClothSimulator::buildGlobalSpatialMap(vector<Cloth *> *cloth_objects) {
 
 // Global Collision
 void ClothSimulator::globalCollision(Cloth* cloth) {
-  // buildGlobalSpatialMap(cloth_objects);
+  
 
   for (PointMass &pm : cloth->point_masses) {
       float hashedPosition = cloth->hash_position(pm.position);
@@ -413,6 +413,8 @@ void ClothSimulator::globalCollision(Cloth* cloth) {
             num += 1;
           }
         }
+      } else {
+          cout << "inconsistent hashing, fix bug" << endl;
       }
       if (num > 0) {
         corrVector /= num;

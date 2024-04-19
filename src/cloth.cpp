@@ -59,7 +59,7 @@ void Cloth::buildGrid() {
       for (int x = 0; x < num_width_points; x++) {
         double xPoint = width / (num_width_points - 1) * x;
         double zPoint = height / (num_height_points - 1) * z;
-        Vector3D point = Vector3D(xPoint, 1.0, zPoint);
+        Vector3D point = Vector3D(xPoint + xOffset , 1.0 + yOffset, zPoint + zOffset);
         bool isPinned = false;
         for (vector<int> v : pinned) {
           if (v[0] == x && v[1] == z) {
@@ -73,10 +73,10 @@ void Cloth::buildGrid() {
   } else {
     for (int y = 0; y < num_height_points; y++) {
       for (int x = 0; x < num_width_points; x++) {
-        double xPoint = width / (num_width_points - 1) * x;
-        double yPoint = height / (num_height_points - 1) * y;
+        double xPoint =  width / (num_width_points - 1) * x;
+        double yPoint =  height / (num_height_points - 1) * y;
         double randomPoint = (rand() / double(RAND_MAX)) * 0.002 - 0.001;
-        Vector3D point = Vector3D(xPoint, yPoint, randomPoint);
+        Vector3D point = Vector3D(xPoint+xOffset, yPoint + yOffset, randomPoint + zOffset);
         bool isPinned = false;
         for (vector<int> v : pinned) {
           if (v[0] == x && v[1] == y) {
@@ -193,15 +193,15 @@ void Cloth::simulate(double frames_per_sec, double simulation_steps,
   }
 
   // TODO (Part 4): Handle self-collisions.
-  build_spatial_map();
-  for (PointMass &pm : point_masses) {
-    self_collide(pm, simulation_steps);
+  // build_spatial_map();
+  //for (PointMass &pm : point_masses) {
+  //  self_collide(pm, simulation_steps);
 
     // TODO (Part 3): Handle collisions with other primitives.
-    for (CollisionObject *obj : *collision_objects) {
-      obj->collide(pm);
-    }
-  }
+  //  for (CollisionObject *obj : *collision_objects) {
+  //    obj->collide(pm);
+  //  }
+  //}
 
   // TODO (Part 2): Constrain the changes to be such that the spring does not
   // change in length more than 10% per timestep [Provot 1995].

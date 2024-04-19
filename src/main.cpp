@@ -158,10 +158,9 @@ void incompleteObjectError(const char *object, const char *attribute) {
   exit(-1);
 }
 
-bool loadObjectsFromFile(string filename, vector<Cloth *> cloths, ClothParameters *cp, vector<CollisionObject *>* objects, int sphere_num_lat, int sphere_num_lon) {
+bool loadObjectsFromFile(string filename, vector<Cloth *> * cloths, ClothParameters *cp, vector<CollisionObject *>* objects, int sphere_num_lat, int sphere_num_lon) {
   // Read JSON from file
-  Cloth * cloth = (cloths)[0];
-  // Cloth * cloth1 = (cloths)[1];
+ 
   ifstream i(filename);
   if (!i.good()) {
     return false;
@@ -169,8 +168,7 @@ bool loadObjectsFromFile(string filename, vector<Cloth *> cloths, ClothParameter
   json j;
   i >> j;
 
-  // cout << cloth->width;
-
+  int clothCounter = 0;
   // Loop over objects in scene
   for (json::iterator it = j.begin(); it != j.end(); ++it) {
     string key = it.key();
@@ -188,6 +186,8 @@ bool loadObjectsFromFile(string filename, vector<Cloth *> cloths, ClothParameter
 
     // Parse object depending on type (cloth, sphere, or plane)
     if (key == CLOTH) {
+        cout << "CLOTH NUMBER: " << clothCounter << endl;
+      
       // Cloth
       // cout << "cloth";
       double width, height;
@@ -195,6 +195,9 @@ bool loadObjectsFromFile(string filename, vector<Cloth *> cloths, ClothParameter
       float thickness;
       e_orientation orientation;
       vector<vector<int>> pinned;
+      vector<double> xOffset;
+      vector<double> yOffset;
+      vector<double> zOffset;
 
       auto it_width = object.find("width");
       if (it_width != object.end()) {
@@ -247,13 +250,43 @@ bool loadObjectsFromFile(string filename, vector<Cloth *> cloths, ClothParameter
         }
       }
 
-      cloth->width = width;
-      cloth->height = height;
-      cloth->num_width_points = num_width_points;
-      cloth->num_height_points = num_height_points;
-      cloth->thickness = thickness;
-      cloth->orientation = orientation;
-      cloth->pinned = pinned;
+      auto it_xOffset = object.find("xOffset");
+      if (it_xOffset != object.end()) {
+          vector<double> points = *it_xOffset;
+          xOffset = points;
+      }
+
+      auto it_yOffset = object.find("yOffset");
+      if (it_yOffset != object.end()) {
+          vector<double> points = *it_yOffset;
+          yOffset = points;
+      }
+
+      auto it_zOffset = object.find("zOffset");
+      if (it_zOffset != object.end()) {
+          vector<double> points = *it_zOffset;
+          zOffset = points;
+      }
+      if (xOffset.size() != yOffset.size() || yOffset.size() != zOffset.size()) {
+          incompleteObjectError("cloth", "Offsets Unequal");
+      }
+
+
+      for (int counter = 0; counter < zOffset.size(); counter++) {
+          Cloth* cloth = new Cloth();
+          cloth->width = width;
+          cloth->height = height;
+          cloth->num_width_points = num_width_points;
+          cloth->num_height_points = num_height_points;
+          cloth->thickness = thickness;
+          cloth->orientation = orientation;
+          cloth->pinned = pinned;
+          cloth->xOffset = xOffset[counter];
+          cloth->yOffset = yOffset[counter];
+          cloth->zOffset = zOffset[counter];
+          cloths->push_back(cloth);
+          clothCounter++;
+      }
 
       // Cloth parameters
       bool enable_structural_constraints, enable_shearing_constraints, enable_bending_constraints;
@@ -307,6 +340,7 @@ bool loadObjectsFromFile(string filename, vector<Cloth *> cloths, ClothParameter
       cp->density = density;
       cp->damping = damping;
       cp->ks = ks;
+      
     } else if (key == SPHERE) {
       Vector3D origin;
       double radius, friction;
@@ -527,8 +561,7 @@ int main(int argc, char **argv) {
   std::string project_root;
   bool found_project_root = find_project_root(search_paths, project_root);
   
-  Cloth cloth;
-  ClothParameters cp;
+  ClothParameters cp; // note: currently cp is shared across all cloths.
   vector<CollisionObject *> objects;
   
   int c;
@@ -591,8 +624,7 @@ int main(int argc, char **argv) {
     file_to_load_from = def_fname.str();
   }
 
-  vector<Cloth *> cloths;
-  cloths.push_back(&cloth);
+  vector<Cloth *> * cloths = new vector<Cloth*>();
 
   bool success = loadObjectsFromFile(file_to_load_from, cloths, &cp, &objects, sphere_num_lat, sphere_num_lon);
   if (!success) {
@@ -603,18 +635,17 @@ int main(int argc, char **argv) {
   glfwSetErrorCallback(error_callback);
 
   createGLContexts();
-
-  // Initialize the Cloth object
-  cloth.buildGrid();
-  cloth.buildClothMesh();
-
-  vector<Cloth *> cloth_objects;
-
-  cloth_objects.push_back(&cloth);
-
+  cout << "CLOTHS: " << cloths->size() << endl;
+  for (Cloth* cloth : *cloths) {
+      // Initialize the Cloth object
+      cloth->buildGrid();
+      cloth->buildClothMesh();
+      
+      vector<Cloth*> cloth_objects;
+  }
   // Initialize the ClothSimulator object
   app = new ClothSimulator(project_root, screen);
-  app->loadCloths(&cloth_objects);
+  app->loadCloths(cloths);
   app->loadClothParameters(&cp);
   app->loadCollisionObjects(&objects);
   app->init();

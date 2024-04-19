@@ -65,6 +65,9 @@ struct Cloth {
   // Cloth properties
   double width;
   double height;
+  double xOffset;
+  double yOffset;
+  double zOffset;
   int num_width_points;
   int num_height_points;
   double thickness;
