@@ -48,6 +48,10 @@ inline bool isPointWithinSquare(const Vector3D& normal, const Vector3f& point0, 
 }
 
 void Belt::collide(PointMass &pm) {
+  Vector3D point0_3D = Vector3D(point0.x(), point0.y(), point0.z());
+  Vector3D point1_3D = Vector3D(point1.x(), point1.y(), point1.z());
+  Vector3D point2_3D = Vector3D(point2.x(), point2.y(), point2.z());
+  Vector3D point3_3D = Vector3D(point3.x(), point3.y(), point3.z());
   // TODO (Part 3): Handle collisions with belts.
   Vector3D point_to_curr = pm.position - point;
   Vector3D point_to_last = pm.last_position - point;
@@ -65,6 +69,8 @@ void Belt::collide(PointMass &pm) {
     } else {
       correction_vector = (tangent_point - pm.last_position) - SURFACE_OFFSET * normal;
     }
+    // point velocity TODO: add scaling factor
+    correction_vector +=  (point1_3D-point0_3D) / (point1_3D-point0_3D).norm() *0.0005;
     pm.position = pm.last_position + (1.0 - friction) * correction_vector;
   }
 }
