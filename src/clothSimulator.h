@@ -37,6 +37,8 @@ public:
   virtual bool scrollCallbackEvent(double x, double y);
   virtual bool resizeCallbackEvent(int width, int height);
 
+  vector<Cloth *> *default_cloth_objects;
+
 private:
   virtual void initGUI(Screen *screen);
   void drawWireframe(GLShader &shader, Cloth *cloth);
@@ -67,6 +69,8 @@ private:
   vector<Cloth *> *cloth_objects;
   ClothParameters *cp;
   vector<CollisionObject *> *collision_objects;
+
+  bool isBeltMoving = false;
 
   // OpenGL attributes
 

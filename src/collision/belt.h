@@ -16,7 +16,7 @@ public:
       : point(point), normal(normal.unit()), friction(friction) {}
 
   void render(GLShader &shader);
-  void collide(PointMass &pm);
+  void collide(PointMass &pm, bool isBeltMoving);
 
   Vector3D point;
   Vector3D normal;

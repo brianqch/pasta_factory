@@ -678,11 +678,12 @@ int main(int argc, char **argv) {
       cloth->buildGrid();
       cloth->buildClothMesh();
       
-      vector<Cloth*> cloth_objects;
+      // vector<Cloth*> cloth_objects;
   }
   // Initialize the ClothSimulator object
   app = new ClothSimulator(project_root, screen);
   app->loadCloths(cloths);
+  // copy(cloths->begin(), cloths->end(), app->default_cloth_objects->begin()); // Attempting to reset properly
   app->loadClothParameters(&cp);
   app->loadCollisionObjects(&objects);
   app->init();

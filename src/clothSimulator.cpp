@@ -10,6 +10,7 @@
 #include "cloth.h"
 #include "collision/plane.h"
 #include "collision/sphere.h"
+#include "collision/belt.h"
 #include "misc/camera_info.h"
 #include "misc/file_utils.h"
 // Needed to generate stb_image binaries. Should only define in exactly one
@@ -424,7 +425,7 @@ void ClothSimulator::globalCollision(Cloth* cloth) {
 
       // TODO (Part 3): Handle collisions with other primitives.
       for (CollisionObject *obj : *collision_objects) {
-        obj->collide(pm);
+        obj->collide(pm, isBeltMoving);
       }
     }
   // for (Cloth* cloth : *cloth_objects){
@@ -729,6 +730,9 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
       break;
     case 'r':
     case 'R':
+      // cloth_objects->clear();
+      // cout << "Default cloth objects size: " << default_cloth_objects->size();
+      // cloth_objects = default_cloth_objects;
       for (Cloth *cloth : *cloth_objects) {
         cloth->reset();
       }
@@ -749,7 +753,7 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
       }
       break;
     case 's':
-    case 'S':
+    case 'S': {
       cout << cloth_objects->size();
 
       vector<Cloth *> cloth_objects_queue;
@@ -763,6 +767,15 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
       }
       cout << '\n';
       break;
+    }
+    case 'b':
+    case 'B': {
+      // Move the conveyer belt.
+      isBeltMoving = !isBeltMoving;
+      cout << "Belt Moving: " << isBeltMoving;
+      break;
+    }
+
     }
   }
 

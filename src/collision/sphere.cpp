@@ -7,7 +7,7 @@
 using namespace nanogui;
 using namespace CGL;
 
-void Sphere::collide(PointMass &pm) {
+void Sphere::collide(PointMass &pm, bool isBeltMoving) {
   // TODO (Part 3): Handle collisions with spheres.
   Vector3D origin_to_position = (pm.position - origin);
   Vector3D unit_orgin_to_position = origin_to_position.unit();
