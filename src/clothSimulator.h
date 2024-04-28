@@ -23,6 +23,7 @@ public:
   void loadCloths(vector<Cloth *> *cloth_objects);
   void loadClothParameters(ClothParameters *cp);
   void loadCollisionObjects(vector<CollisionObject *> *objects);
+  void splitOnCollide();
   virtual bool isAlive();
   virtual void drawContents();
   virtual void buildGlobalSpatialMap(vector<Cloth *> *cloth_objects);
@@ -38,6 +39,7 @@ public:
   virtual bool resizeCallbackEvent(int width, int height);
 
   vector<Cloth *> *default_cloth_objects;
+  bool completedSplit = false;
 
 private:
   virtual void initGUI(Screen *screen);
@@ -71,6 +73,7 @@ private:
   vector<CollisionObject *> *collision_objects;
 
   bool isBeltMoving = false;
+  bool *isHitSplitter = new bool(false);
 
   // OpenGL attributes
 

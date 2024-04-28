@@ -17,6 +17,7 @@
 #include "collision/plane.h"
 #include "collision/sphere.h"
 #include "collision/belt.h"
+#include "collision/splitter.h"
 #include "cloth.h"
 #include "clothSimulator.h"
 #include "json.hpp"
@@ -34,10 +35,11 @@ using json = nlohmann::json;
 const string SPHERE = "sphere";
 const string PLANE = "plane";
 const string BELT = "belt";
+const string SPLITTER = "splitter";
 const string CLOTH = "cloth";
 const string CLOTH1 = "cloth1";
 
-const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, BELT, CLOTH, CLOTH1};
+const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, BELT, SPLITTER, CLOTH, CLOTH1};
 
 ClothSimulator *app = nullptr;
 GLFWwindow *window = nullptr;
@@ -405,6 +407,34 @@ bool loadObjectsFromFile(string filename, vector<Cloth *> * cloths, ClothParamet
         incompleteObjectError("belt", "friction");
       }
       Belt *b = new Belt(point, normal, friction);
+      objects->push_back(b);
+    } else if (key == SPLITTER) {
+        Vector3D point, normal;
+      double friction;
+
+      auto it_point = object.find("point");
+      if (it_point != object.end()) {
+        vector<double> vec_point = *it_point;
+        point = Vector3D(vec_point[0], vec_point[1], vec_point[2]);
+      } else {
+        incompleteObjectError("splitter", "point");
+      }
+
+      auto it_normal = object.find("normal");
+      if (it_normal != object.end()) {
+        vector<double> vec_normal = *it_normal;
+        normal = Vector3D(vec_normal[0], vec_normal[1], vec_normal[2]);
+      } else {
+        incompleteObjectError("splitter", "normal");
+      }
+
+      auto it_friction = object.find("friction");
+      if (it_friction != object.end()) {
+        friction = *it_friction;
+      } else {
+        incompleteObjectError("splitter", "friction");
+      }
+      Splitter *b = new Splitter(point, normal, friction);
       objects->push_back(b);
     }
     // else if (key == CLOTH1) { 

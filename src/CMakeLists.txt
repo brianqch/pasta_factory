@@ -10,6 +10,7 @@ set(CLOTHSIM_VIEWER_SOURCE
     collision/sphere.cpp
     collision/plane.cpp
     collision/belt.cpp
+    collision/splitter.cpp
 
     # Application
     main.cpp

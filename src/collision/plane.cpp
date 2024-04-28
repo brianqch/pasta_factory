@@ -10,7 +10,7 @@ using namespace CGL;
 
 #define SURFACE_OFFSET 0.0001
 
-void Plane::collide(PointMass &pm, bool isBeltMoving) {
+void Plane::collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter) {
   // TODO (Part 3): Handle collisions with planes.
   Vector3D point_to_curr = pm.position - point;
   Vector3D point_to_last = pm.last_position - point;

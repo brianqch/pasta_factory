@@ -11,6 +11,8 @@
 #include "collision/plane.h"
 #include "collision/sphere.h"
 #include "collision/belt.h"
+#include "collision/splitter.h"
+
 #include "misc/camera_info.h"
 #include "misc/file_utils.h"
 // Needed to generate stb_image binaries. Should only define in exactly one
@@ -425,7 +427,11 @@ void ClothSimulator::globalCollision(Cloth* cloth) {
 
       // TODO (Part 3): Handle collisions with other primitives.
       for (CollisionObject *obj : *collision_objects) {
-        obj->collide(pm, isBeltMoving);
+        obj->collide(pm, isBeltMoving, *isHitSplitter);
+        if (!completedSplit && *isHitSplitter) {
+          completedSplit = true;
+          splitOnCollide();
+        }
       }
     }
   // for (Cloth* cloth : *cloth_objects){
@@ -512,6 +518,25 @@ void ClothSimulator::drawWireframe(GLShader &shader, Cloth *cloth) {
   // shader.uploadAttrib("in_normal", normals);
 
   shader.drawArray(GL_LINES, 0, num_springs * 2);
+}
+
+void ClothSimulator::splitOnCollide() {
+
+
+    for (int i = 0; i < 3; i++) {
+      vector<Cloth *> cloth_objects_queue;
+
+      for (Cloth *cloth : *cloth_objects) {
+        cloth_objects_queue.push_back(cloth);
+      }
+      for (Cloth *cloth : cloth_objects_queue) {
+        cloth->split_cloth(*cloth_objects);
+      }
+    }
+      cout << cloth_objects->size();
+
+      // cout << '\n';
+      // break;
 }
 
 void ClothSimulator::drawNormals(GLShader &shader, Cloth *cloth) {
@@ -754,18 +779,19 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
       break;
     case 's':
     case 'S': {
-      cout << cloth_objects->size();
+      // cout << cloth_objects->size();
 
-      vector<Cloth *> cloth_objects_queue;
+      // vector<Cloth *> cloth_objects_queue;
 
-      for (Cloth *cloth : *cloth_objects) {
-        cloth_objects_queue.push_back(cloth);
-      }
+      // for (Cloth *cloth : *cloth_objects) {
+      //   cloth_objects_queue.push_back(cloth);
+      // }
 
-      for (Cloth *cloth : cloth_objects_queue) {
-        cloth->split_cloth(*cloth_objects);
-      }
-      cout << '\n';
+      // for (Cloth *cloth : cloth_objects_queue) {
+      //   cloth->split_cloth(*cloth_objects);
+      // }
+      // cout << '\n';
+      splitOnCollide();
       break;
     }
     case 'b':

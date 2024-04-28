@@ -15,7 +15,7 @@ public:
         friction(friction), m_sphere_mesh(Misc::SphereMesh(num_lat, num_lon)) {}
 
   void render(GLShader &shader);
-  void collide(PointMass &pm, bool isBeltMoving);
+  void collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter);
 
 private:
   Vector3D origin;
