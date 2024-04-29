@@ -22,6 +22,7 @@
 #include "clothSimulator.h"
 #include "json.hpp"
 #include "misc/file_utils.h"
+#include "collision/box.h"
 
 typedef uint32_t gid_t;
 
@@ -38,8 +39,9 @@ const string BELT = "belt";
 const string SPLITTER = "splitter";
 const string CLOTH = "cloth";
 const string CLOTH1 = "cloth1";
+const string BOX = "box";
 
-const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, BELT, SPLITTER, CLOTH, CLOTH1};
+const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, BELT, SPLITTER, CLOTH, CLOTH1, BOX};
 
 ClothSimulator *app = nullptr;
 GLFWwindow *window = nullptr;
@@ -559,6 +561,35 @@ bool loadObjectsFromFile(string filename, vector<Cloth *> * cloths, ClothParamet
     //   cp->damping = damping;
     //   cp->ks = ks;
     // } 
+    else if (key == BOX) {
+      Vector3D center;
+      double dist, friction;
+
+      auto it_center = object.find("center");
+      if (it_center != object.end()) {
+        vector<double> vec_center = *it_center;
+        center = Vector3D(vec_center[0], vec_center[1], vec_center[2]);
+      } else {
+        incompleteObjectError("box", "center");
+      } 
+
+      auto it_dist = object.find("dist");
+      if (it_dist != object.end()) {
+        dist = *it_dist;
+      } else {
+        incompleteObjectError("box", "dist");
+      }
+
+      auto it_friction = object.find("friction");
+      if (it_friction != object.end()) {
+        friction = *it_friction;
+      } else {
+        incompleteObjectError("box", "friction");
+      }
+
+      Box *b = new Box(center, dist, friction);
+      objects->push_back(b);
+    }
     else { // PLANE
       Vector3D point, normal;
       double friction;

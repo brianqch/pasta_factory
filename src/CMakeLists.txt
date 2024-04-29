@@ -11,6 +11,7 @@ set(CLOTHSIM_VIEWER_SOURCE
     collision/plane.cpp
     collision/belt.cpp
     collision/splitter.cpp
+    collision/box.cpp
 
     # Application
     main.cpp

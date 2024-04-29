@@ -20,16 +20,38 @@ void Plane::collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter) {
   if (signed_dist_point_to_last * signed_dist_point_to_curr <= 0) {
     Vector3D tangent_point = pm.position - normal.unit() * signed_dist_point_to_curr;
     Vector3D correction_vector;
+    if (manualRender) { //in manualRender, if a collision occurs outside the face's bounding box - don't adjust w/ correction vector
+      float min_x =
+          std::min({corner1.x(), corner2.x(), corner3.x(), corner4.x()});
+      float max_x =
+          std::max({corner1.x(), corner2.x(), corner3.x(), corner4.x()});
+      float min_y =
+          std::min({corner1.y(), corner2.y(), corner3.y(), corner4.y()});
+      float max_y =
+          std::max({corner1.y(), corner2.y(), corner3.y(), corner4.y()});
+      float min_z =
+          std::min({corner1.z(), corner2.z(), corner3.z(), corner4.z()});
+      float max_z =
+          std::max({corner1.z(), corner2.z(), corner3.z(), corner4.z()});
+      if (!(tangent_point.x >= min_x && tangent_point.x <= max_x && tangent_point.y >= min_y &&
+          tangent_point.y <= max_y && tangent_point.z >= min_z && tangent_point.z <= max_z)) {
+        return;
+      }
+    }
     if (signed_dist_point_to_curr < 0) {
-      correction_vector = (tangent_point - pm.last_position) + SURFACE_OFFSET * normal;
+      correction_vector =
+          (tangent_point - pm.last_position) + SURFACE_OFFSET * normal;
     } else {
-      correction_vector = (tangent_point - pm.last_position) - SURFACE_OFFSET * normal;
+      correction_vector =
+          (tangent_point - pm.last_position) - SURFACE_OFFSET * normal;
     }
     pm.position = pm.last_position + (1.0 - friction) * correction_vector;
   }
 }
 
 void Plane::render(GLShader &shader) {
+  if (hidden) return;
+
   nanogui::Color color(0.7f, 0.7f, 0.7f, 1.0f);
 
   Vector3f sPoint(point.x, point.y, point.z);
@@ -41,11 +63,17 @@ void Plane::render(GLShader &shader) {
 
   MatrixXf positions(3, 4);
   MatrixXf normals(3, 4);
-
+  
   positions.col(0) << sPoint + 2 * (sCross + sParallel);
   positions.col(1) << sPoint + 2 * (sCross - sParallel);
   positions.col(2) << sPoint + 2 * (-sCross + sParallel);
   positions.col(3) << sPoint + 2 * (-sCross - sParallel);
+  if (manualRender) {
+    positions.col(0) << corner1;
+    positions.col(1) << corner2;
+    positions.col(2) << corner3;
+    positions.col(3) << corner4;
+  }
 
   normals.col(0) << sNormal;
   normals.col(1) << sNormal;

@@ -71,7 +71,7 @@ void Belt::collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter) {
     }
     // point velocity TODO: add scaling factor
     if (isBeltMoving) {
-      correction_vector +=  (point1_3D-point0_3D) / (point1_3D-point0_3D).norm() *0.0005;
+      correction_vector -=  (point1_3D-point3_3D) / (point1_3D-point3_3D).norm() *0.0005;
     }
     pm.position = pm.last_position + (1.0 - friction) * correction_vector;
   }
@@ -82,25 +82,29 @@ void Belt::render(GLShader &shader) {
 
   Vector3f sPoint(point.x, point.y, point.z);
   Vector3f sNormal(normal.x, normal.y, normal.z);
-  Vector3f sParallel(normal.y - normal.z, normal.z - normal.x,
-                     normal.x - normal.y);
-  sParallel.normalize();
-  Vector3f sCross = sNormal.cross(sParallel);
+  // Vector3f sParallel(normal.y - normal.z, normal.z - normal.x,
+  //                    normal.x - normal.y);
+  // sParallel.normalize();
+  // Vector3f sCross = sNormal.cross(sParallel);
 
   MatrixXf positions(3, 4);
   MatrixXf normals(3, 4);
 
-  float lengthScale = 1.5;
-  point0 = sPoint + 0.5 * (sCross + sParallel);
-  point1 = sPoint + 0.5 * (sCross - sParallel);
-  point2 = sPoint + 0.5 * (-sCross + sParallel);
-  point3 = sPoint + 0.5 * (-sCross - sParallel);
+  float lengthScale = 1.0;
+  // point0 = sPoint + 0.5 * (sCross + sParallel);
+  // point1 = sPoint + 0.5 * (sCross - sParallel);
+  // point2 = sPoint + 0.5 * (-sCross + sParallel);
+  // point3 = sPoint + 0.5 * (-sCross - sParallel);
 
-  point0 += lengthScale * (point0 - point1);
-  point1 += lengthScale * (point1 - point0);
-  point2 += lengthScale * (point2 - point3);
-  point3 += lengthScale * (point3 - point2);
+  // point0 += lengthScale * (point0 - point1);
+  // point1 += lengthScale * (point1 - point0);
+  // point2 += lengthScale * (point2 - point3);
+  // point3 += lengthScale * (point3 - point2);
 
+  point0 = sPoint + Vector3f(0.5, 0, 0.5+lengthScale);
+  point1 = sPoint + Vector3f(-0.5, 0, 0.5+lengthScale);
+  point2 = sPoint + Vector3f(0.5, 0, -0.5-lengthScale);
+  point3 = sPoint + Vector3f(-0.5, 0, -0.5-lengthScale);
   positions.col(0) << point0;
   positions.col(1) << point1;
   positions.col(2) << point2;
