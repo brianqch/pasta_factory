@@ -20,7 +20,7 @@ void Plane::collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter) {
   if (signed_dist_point_to_last * signed_dist_point_to_curr <= 0) {
     Vector3D tangent_point = pm.position - normal.unit() * signed_dist_point_to_curr;
     Vector3D correction_vector;
-    if (manualRender) { //in manualRender, if a collision occurs outside the face's bounding box - don't adjust w/ correction vector
+    if (manualRender) { //in manualRender, if a collision occurs outside the face's bounding box - don't adjust w/ correction vectorwe
       float min_x =
           std::min({corner1.x(), corner2.x(), corner3.x(), corner4.x()});
       float max_x =
@@ -45,6 +45,8 @@ void Plane::collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter) {
       correction_vector =
           (tangent_point - pm.last_position) - SURFACE_OFFSET * normal;
     }
+    collided = true;
+    if (hidden) return;
     pm.position = pm.last_position + (1.0 - friction) * correction_vector;
   }
 }

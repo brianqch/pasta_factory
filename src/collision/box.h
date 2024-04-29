@@ -29,6 +29,7 @@ public:
   Plane plane4;
   Plane plane5;
   Plane plane6;
+  bool collided;
 };
 
 #endif /* COLLISIONOBJECT_BOX_H */

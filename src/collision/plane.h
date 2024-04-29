@@ -23,6 +23,7 @@ public:
   Vector3D normal;
   bool manualRender;
   bool hidden;
+  bool collided;
   
   Vector3f corner1;
   Vector3f corner2;

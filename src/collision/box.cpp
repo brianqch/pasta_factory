@@ -58,18 +58,18 @@ Box::Box(Vector3D center, double dist, double friction) {
     Vector3D point5 = Vector3D(center.x, center.y, center.z+dist/2);
     Vector3D normal5 = (center - point5).unit();
     plane5 = Plane(point5, normal5, friction, true, true);
-    // plane5.corner1 = toVector3f(point4) + Vector3f(-dist/2, dist/2, 0);
-    // plane5.corner2 = toVector3f(point4) + Vector3f(dist/2, dist/2, 0);
-    // plane5.corner3 = toVector3f(point4) + Vector3f(-dist/2, -dist/2, 0);
-    // plane5.corner4 = toVector3f(point4) + Vector3f(dist/2, -dist/2, 0);
+    plane5.corner1 = toVector3f(point5) + Vector3f(-dist/2, dist/2, 0);
+    plane5.corner2 = toVector3f(point5) + Vector3f(dist/2, dist/2, 0);
+    plane5.corner3 = toVector3f(point5) + Vector3f(-dist/2, -dist/2, 0);
+    plane5.corner4 = toVector3f(point5) + Vector3f(dist/2, -dist/2, 0);
 
     Vector3D point6 = Vector3D(center.x, center.y, center.z-dist/2);
     Vector3D normal6 = (center - point6).unit();
     plane6 = Plane(point6, normal6, friction, true, true);
-    // plane6.corner1 = toVector3f(point4) + Vector3f(-dist/2, dist/2, 0);
-    // plane6.corner2 = toVector3f(point4) + Vector3f(dist/2, dist/2, 0);
-    // plane6.corner3 = toVector3f(point4) + Vector3f(-dist/2, -dist/2, 0);
-    // plane6.corner4 = toVector3f(point4) + Vector3f(dist/2, -dist/2, 0);
+    plane6.corner1 = toVector3f(point6) + Vector3f(-dist/2, dist/2, 0);
+    plane6.corner2 = toVector3f(point6) + Vector3f(dist/2, dist/2, 0);
+    plane6.corner3 = toVector3f(point6) + Vector3f(-dist/2, -dist/2, 0);
+    plane6.corner4 = toVector3f(point6) + Vector3f(dist/2, -dist/2, 0);
 }
 
 void Box::collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter) {
@@ -79,6 +79,9 @@ void Box::collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter) {
     plane4.collide(pm, isBeltMoving, isHitSplitter);
     plane5.collide(pm, isBeltMoving, isHitSplitter);
     plane6.collide(pm, isBeltMoving, isHitSplitter);
+    if (plane5.collided && plane6.collided) {
+        isHitSplitter = true;
+    }
 }
 
 void Box::render(GLShader &shader) {

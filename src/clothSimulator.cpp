@@ -791,7 +791,7 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
       //   cloth->split_cloth(*cloth_objects);
       // }
       // cout << '\n';
-      splitOnCollide();
+      //splitOnCollide();
       break;
     }
     case 'b':
