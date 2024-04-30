@@ -92,3 +92,6 @@ void Plane::render(GLShader &shader) {
 
   shader.drawArray(GL_TRIANGLE_STRIP, 0, 4);
 }
+void Plane::renderSlicers(GLShader &shader, int num_slicers) {
+
+}

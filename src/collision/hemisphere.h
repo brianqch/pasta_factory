@@ -16,6 +16,7 @@ public:
 
   void render(GLShader &shader);
   void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter);
+  void renderSlicers(GLShader &shader, int num_slicers);
 
 private:
   Vector3D origin;

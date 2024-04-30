@@ -15,8 +15,9 @@ public:
   Belt(const Vector3D &point, const Vector3D &normal, double friction)
       : point(point), normal(normal.unit()), friction(friction) {}
 
-  void render(GLShader &shader);
+  void render(GLShader &shader );
   void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter);
+  void renderSlicers(GLShader &shader, int num_slicers);
 
   Vector3D point;
   Vector3D normal;

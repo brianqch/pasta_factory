@@ -24,3 +24,6 @@ void Sphere::render(GLShader &shader) {
   // and intersect with the sphere when rendered
   m_sphere_mesh.draw_sphere(shader, origin, radius * 0.92);
 }
+
+void Sphere::renderSlicers(GLShader &shader, int num_slicers) {}
+

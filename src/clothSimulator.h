@@ -65,6 +65,8 @@ private:
   int frames_per_sec = 90;
   int simulation_steps = 30;
 
+  int num_slicers = 0;
+
   CGL::Vector3D gravity = CGL::Vector3D(0, -9.8, 0);
   nanogui::Color color = nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f);
 

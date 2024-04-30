@@ -151,11 +151,63 @@ void Box::render(GLShader &shader) {
     plane4.render(shader);
     plane5.render(shader);
     plane6.render(shader);
-    cut1.render(shader);
-    cut2.render(shader);
-    cut3.render(shader);
-    cut4.render(shader);
-    cut5.render(shader);
-    cut6.render(shader);
-    cut7.render(shader);
 }
+
+void Box::renderSlicers(GLShader &shader, int num_slicers) {
+    switch (num_slicers) {
+        // 1 2 3 4 5 6 7 
+        case 0:
+            break;
+        case 1: 
+            cut4.render(shader);
+            break;
+        case 2:
+            cut3.render(shader);
+            cut5.render(shader);
+            break;
+        case 3: 
+            cut2.render(shader);
+            cut4.render(shader);
+            cut6.render(shader);
+            break;
+        case 4:
+            cut1.render(shader);
+            cut3.render(shader);
+            cut5.render(shader);
+            cut7.render(shader);
+            break;
+        case 5: 
+            cut2.render(shader);
+            cut3.render(shader);
+            cut4.render(shader);
+            cut5.render(shader);
+            cut6.render(shader);
+            break;
+        case 6:
+            cut1.render(shader);
+            cut2.render(shader);
+            cut3.render(shader);
+            cut5.render(shader);
+            cut6.render(shader);
+            cut7.render(shader);
+            break;
+        case 7: 
+            cut1.render(shader);
+            cut2.render(shader);
+            cut3.render(shader);
+            cut4.render(shader);
+            cut5.render(shader);
+            cut6.render(shader);
+            cut7.render(shader);
+            break;
+    }
+
+    // cut1.render(shader);
+    // cut2.render(shader);
+    // cut3.render(shader);
+    // cut4.render(shader);
+    // cut5.render(shader);
+    // cut6.render(shader);
+    // cut7.render(shader);
+}
+

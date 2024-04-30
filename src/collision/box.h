@@ -18,6 +18,7 @@ public:
   void render(GLShader &shader); //do render /w ea of 6 planes
   void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter); //check collide w/ ea of 6 planes
   //2 planes phantom, don't render phantom planes (front one dont care, back one - split pasta)
+  void renderSlicers(GLShader &shader, int num_slicers);
 
   Vector3D center;
   float dist;

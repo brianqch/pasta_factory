@@ -416,7 +416,8 @@ void ClothSimulator::drawContents() {
       obj_shader.setUniform("u_height_scaling", m_height_scaling, false);
 
       obj_shader.setUniform("u_texture_cubemap", 5, false);
-    co->render(shader);
+    co->render(obj_shader);
+    co->renderSlicers(obj_shader, num_slicers);
   }
 }
 
@@ -963,6 +964,8 @@ void ClothSimulator::initGUI(Screen *screen) {
     fb->setSpinnable(true);
     fb->setMinValue(0);
     fb->setCallback([this](float value) { cp->ks = value; });
+
+    
   }
 
   // Simulation constants
@@ -997,6 +1000,9 @@ void ClothSimulator::initGUI(Screen *screen) {
     num_steps->setSpinnable(true);
     num_steps->setMinValue(0);
     num_steps->setCallback([this](int value) { simulation_steps = value; });
+
+  
+
   }
 
   // Damping slider and textbox
@@ -1071,6 +1077,32 @@ void ClothSimulator::initGUI(Screen *screen) {
     fb->setUnits("m/s^2");
     fb->setSpinnable(true);
     fb->setCallback([this](float value) { gravity.z = value; });
+  }
+
+new Label(window, "Slicers", "sans-bold");
+
+  {
+    Widget *panel = new Widget(window);
+    GridLayout *layout =
+        new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
+    layout->setColAlignment({Alignment::Maximum, Alignment::Fill});
+    layout->setSpacing(0, 10);
+    panel->setLayout(layout);
+
+    new Label(panel, "slicer(s) :", "sans-bold");
+
+    IntBox<int> *num_slicers_box = new IntBox<int>(panel);
+    num_slicers_box->setEditable(true);
+    num_slicers_box->setFixedSize(Vector2i(100, 20));
+    num_slicers_box->setFontSize(14);
+    num_slicers_box->setValue(num_slicers);
+    num_slicers_box->setSpinnable(true);
+    num_slicers_box->setMinValue(1);
+    num_slicers_box->setMaxValue(7);
+    num_slicers_box->setCallback([this](int value) { num_slicers = value; });
+
+  
+
   }
 
   window = new Window(screen, "Appearance");
