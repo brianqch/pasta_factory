@@ -27,9 +27,9 @@ void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
       float max_x =
           std::max({corner1.x(), corner2.x(), corner3.x(), corner4.x()});
       float min_y =
-          std::min({corner1.y(), corner2.y(), corner3.y(), corner4.y()});
+          std::min({corner1.y(), corner2.y(), corner3.y(), corner4.y()}) + slicerHeight;
       float max_y =
-          std::max({corner1.y(), corner2.y(), corner3.y(), corner4.y()});
+          std::max({corner1.y(), corner2.y(), corner3.y(), corner4.y()}) + slicerHeight;
       float min_z =
           std::min({corner1.z(), corner2.z(), corner3.z(), corner4.z()});
       float max_z =
