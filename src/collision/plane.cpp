@@ -59,7 +59,6 @@ void Plane::render(GLShader &shader) {
   if (hidden) return;
 
   nanogui::Color color(0.7f, 0.7f, 0.7f, 1.0f);
-
   Vector3f sPoint(point.x, point.y, point.z);
   Vector3f sNormal(normal.x, normal.y, normal.z);
   Vector3f sParallel(normal.y - normal.z, normal.z - normal.x,
@@ -75,10 +74,10 @@ void Plane::render(GLShader &shader) {
   positions.col(2) << sPoint + 2 * (-sCross + sParallel);
   positions.col(3) << sPoint + 2 * (-sCross - sParallel);
   if (manualRender) {
-    positions.col(0) << corner1;
-    positions.col(1) << corner2;
-    positions.col(2) << corner3;
-    positions.col(3) << corner4;
+    positions.col(0) << corner1 + Vector3f(0, slicerHeight, 0);
+    positions.col(1) << corner2 + Vector3f(0, slicerHeight, 0);
+    positions.col(2) << corner3 + Vector3f(0, slicerHeight, 0);
+    positions.col(3) << corner4 + Vector3f(0, slicerHeight, 0);
   }
 
   normals.col(0) << sNormal;
@@ -96,6 +95,6 @@ void Plane::render(GLShader &shader) {
 
   shader.drawArray(GL_TRIANGLE_STRIP, 0, 4);
 }
-void Plane::renderSlicers(GLShader &shader, int num_slicers) {
+void Plane::renderSlicers(GLShader &shader, int num_slicers, double slicerHeight) {
 
 }

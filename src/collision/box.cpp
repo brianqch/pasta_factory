@@ -73,7 +73,7 @@ Box::Box(Vector3D center, float dist, double friction) {
 
     Vector3D point7 = Vector3D(center.x-3*(dist/8), center.y, center.z);
     Vector3D normal7 = (center - point7).unit();
-    cut1 = Plane(point7, normal7, friction, true);
+    cut1 = Plane(point7, normal7, friction, true, false);
     cut1.corner1 = toVector3f(point7) + Vector3f(0, dist/2, -dist/2);
     cut1.corner2 = toVector3f(point7) + Vector3f(0, dist/2, dist/2);
     cut1.corner3 = toVector3f(point7) + Vector3f(0, -dist/2, -dist/2);
@@ -81,7 +81,7 @@ Box::Box(Vector3D center, float dist, double friction) {
 
     Vector3D point8 = Vector3D(center.x-2*(dist/8), center.y, center.z);
     Vector3D normal8 = (center - point8).unit();
-    cut2 = Plane(point8, normal8, friction, true);
+    cut2 = Plane(point8, normal8, friction, true, false);
     cut2.corner1 = toVector3f(point8) + Vector3f(0, dist/2, -dist/2);
     cut2.corner2 = toVector3f(point8) + Vector3f(0, dist/2, dist/2);
     cut2.corner3 = toVector3f(point8) + Vector3f(0, -dist/2, -dist/2);
@@ -89,7 +89,7 @@ Box::Box(Vector3D center, float dist, double friction) {
 
     Vector3D point9 = Vector3D(center.x-dist/8, center.y, center.z);
     Vector3D normal9 = (center - point9).unit();
-    cut3 = Plane(point9, normal9, friction, true);
+    cut3 = Plane(point9, normal9, friction, true, false);
     cut3.corner1 = toVector3f(point9) + Vector3f(0, dist/2, -dist/2);
     cut3.corner2 = toVector3f(point9) + Vector3f(0, dist/2, dist/2);
     cut3.corner3 = toVector3f(point9) + Vector3f(0, -dist/2, -dist/2);
@@ -97,7 +97,7 @@ Box::Box(Vector3D center, float dist, double friction) {
 
     Vector3D point10 = Vector3D(center.x, center.y, center.z);
     Vector3D normal10 = (center - point10).unit();
-    cut4 = Plane(point10, normal10, friction, true);
+    cut4 = Plane(point10, normal10, friction, true, false);
     cut4.corner1 = toVector3f(point10) + Vector3f(0, dist/2, -dist/2);
     cut4.corner2 = toVector3f(point10) + Vector3f(0, dist/2, dist/2);
     cut4.corner3 = toVector3f(point10)+ Vector3f(0, -dist/2, -dist/2);
@@ -105,7 +105,7 @@ Box::Box(Vector3D center, float dist, double friction) {
 
     Vector3D point11 = Vector3D(center.x+dist/8, center.y, center.z);
     Vector3D normal11 = (center - point11).unit();
-    cut5 = Plane(point11, normal11, friction, true);
+    cut5 = Plane(point11, normal11, friction, true, false);
     cut5.corner1 = toVector3f(point11) + Vector3f(0, dist/2, -dist/2);
     cut5.corner2 = toVector3f(point11) + Vector3f(0, dist/2, dist/2);
     cut5.corner3 = toVector3f(point11) + Vector3f(0, -dist/2, -dist/2);
@@ -113,7 +113,7 @@ Box::Box(Vector3D center, float dist, double friction) {
 
     Vector3D point12 = Vector3D(center.x+2*(dist/8), center.y, center.z);
     Vector3D normal12 = (center - point12).unit();
-    cut6 = Plane(point12, normal12, friction, true);
+    cut6 = Plane(point12, normal12, friction, true, false);
     cut6.corner1 = toVector3f(point12) + Vector3f(0, dist/2, -dist/2);
     cut6.corner2 = toVector3f(point12) + Vector3f(0, dist/2, dist/2);
     cut6.corner3 = toVector3f(point12) + Vector3f(0, -dist/2, -dist/2);
@@ -121,7 +121,7 @@ Box::Box(Vector3D center, float dist, double friction) {
 
     Vector3D point13 = Vector3D(center.x+3*(dist/8), center.y, center.z);
     Vector3D normal13 = (center - point13).unit();
-    cut7 = Plane(point13, normal13, friction, true);
+    cut7 = Plane(point13, normal13, friction, true, false);
     cut7.corner1 = toVector3f(point13) + Vector3f(0, dist/2, -dist/2);
     cut7.corner2 = toVector3f(point13) + Vector3f(0, dist/2, dist/2);
     cut7.corner3 = toVector3f(point13) + Vector3f(0, -dist/2, -dist/2);
@@ -154,7 +154,14 @@ void Box::render(GLShader &shader) {
     plane6.render(shader);
 }
 
-void Box::renderSlicers(GLShader &shader, int num_slicers) {
+void Box::renderSlicers(GLShader &shader, int num_slicers, double slicerHeight) {
+    cut1.slicerHeight = slicerHeight;
+    cut2.slicerHeight = slicerHeight;
+    cut3.slicerHeight = slicerHeight;
+    cut4.slicerHeight = slicerHeight;
+    cut5.slicerHeight = slicerHeight;
+    cut6.slicerHeight = slicerHeight;
+    cut7.slicerHeight = slicerHeight;
     switch (num_slicers) {
         // 1 2 3 4 5 6 7 
         case 0:

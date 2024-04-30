@@ -116,4 +116,4 @@ void Splitter::render(GLShader &shader) {
 //   shader.drawArray(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void Splitter::renderSlicers(GLShader &shader, int num_slicers) {}
+void Splitter::renderSlicers(GLShader &shader, int num_slicers, double slicerHeight) {}

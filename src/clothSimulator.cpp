@@ -418,7 +418,7 @@ void ClothSimulator::drawContents() {
 
       obj_shader.setUniform("u_texture_cubemap", 5, false);
     co->render(obj_shader);
-    co->renderSlicers(obj_shader, num_slicers);
+    co->renderSlicers(obj_shader, num_slicers, cp->slicerHeight);
   }
 }
 
@@ -1102,9 +1102,40 @@ new Label(window, "Slicers", "sans-bold");
     num_slicers_box->setMinValue(1);
     num_slicers_box->setMaxValue(7);
     num_slicers_box->setCallback([this](int value) { num_slicers = value; });
+  }
+    new Label(window, "slicer height:", "sans-bold");
 
-  
+  {
+    Widget *panel = new Widget(window);
+    GridLayout *layout =
+        new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
+    layout->setColAlignment({Alignment::Maximum, Alignment::Fill});
+    layout->setSpacing(0, 10);
+    panel->setLayout(layout);
 
+
+    panel->setLayout(
+        new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
+
+    Slider *slider = new Slider(panel);
+    slider->setValue(cp->slicerHeight); // fix
+    slider->setFixedWidth(105);
+    slider->setRange(std::make_pair(-1.0, 1.0));
+
+    TextBox *percentage = new TextBox(panel);
+    percentage->setFixedWidth(75);
+    percentage->setValue("0"); //fix
+    //percentage->setUnits("%");
+    percentage->setFontSize(14);
+    
+
+    slider->setCallback([percentage](float value) {
+      percentage->setValue(std::to_string(value)); // fix
+    });
+    slider->setFinalCallback([&](float value) { //fix
+      cp->slicerHeight = (double)value;
+      // cout << "Final slider value: " << (int)(value * 100) << endl;
+    });
   }
 
   window = new Window(screen, "Appearance");
