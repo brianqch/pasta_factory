@@ -7,6 +7,7 @@
 #include "camera.h"
 #include "cloth.h"
 #include "collision/collisionObject.h"
+#include <set>
 
 using namespace nanogui;
 
@@ -66,6 +67,8 @@ private:
   int simulation_steps = 30;
 
   int num_slicers = 0;
+  std::set<int>* slice_coords_set = new std::set<int>;
+
 
   CGL::Vector3D gravity = CGL::Vector3D(0, -9.8, 0);
   nanogui::Color color = nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f);

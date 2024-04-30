@@ -3,6 +3,7 @@
 #include <math.h>
 #include <random>
 #include <vector>
+#include <set>
 
 #include "CGL/vector3D.h"
 #include "cloth.h"
@@ -247,7 +248,7 @@ void Cloth::build_spatial_map() {
   }
 }
 
-void Cloth::build_bucket_map(vector<int> coords) {
+void Cloth::build_bucket_map(set<int> &slice_coords_set) {
   for (const auto &entry : map) {
     delete (entry.second);
   }
@@ -255,7 +256,7 @@ void Cloth::build_bucket_map(vector<int> coords) {
 
   // TODO (Part 4): Build a spatial map out of all of the point masses.
 
-  for (int i = 0; i <= coords.size(); i ++) {
+  for (int i = 0; i <= (slice_coords_set).size(); i ++) {
     if (!bucket_map[i]) {
       bucket_map[i] = new vector<PointMass>();
     }
@@ -586,24 +587,28 @@ void Cloth::create_cloth(double width, double height, int num_width_points, int 
 }
 
 
-void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, vector<int> coords) {
+void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, std::set<int> &slice_coords_set) {
   // check if coord splits are valid
-  for (int coord: coords) {
+  for (int coord: slice_coords_set) {
     if (coord < 0 || coord > num_width_points) {
       return;
     }
   }
 
-  build_bucket_map(coords);
+  build_bucket_map(slice_coords_set);
   
   if (num_width_points == 2) {
     return;
   }
 
-  int interval_size = coords.size();
+  int interval_size = slice_coords_set.size();
 
   int firsthalf = 0;
   int secondhalf = 0;
+
+  // Turn set into list
+  vector<int> coords(slice_coords_set.begin(), slice_coords_set.end());
+  std::sort(coords.begin(), coords.end());
  
 
     for (int h = 0; h < num_height_points; h++) {
@@ -617,6 +622,9 @@ void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, vector<int> coor
             // for (int i = 0; i < coords.size(); i++) {
             //     cout << coords[i] << "\n";
             // }
+
+            
+            
             
             for (int i = 0; i < coords.size(); i++) {
               if (bucket_start <= w && w < coords[i]) {

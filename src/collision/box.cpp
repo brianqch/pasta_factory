@@ -135,6 +135,7 @@ void Box::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
     plane4.collide(pm, isBeltMoving, isHitSplitter);
     plane5.collide(pm, isBeltMoving, isHitSplitter);
     plane6.collide(pm, isBeltMoving, isHitSplitter);
+    cut4.collide(pm, isBeltMoving, isHitSplitter);
     if (plane5.collided && plane6.collided) {
         // cout << "hit";
         isHitSplitter = true;

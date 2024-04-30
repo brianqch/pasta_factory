@@ -1,5 +1,6 @@
 #include <cmath>
 #include <glad/glad.h>
+#include <set>
 
 #include <CGL/vector3D.h>
 #include <nanogui/nanogui.h>
@@ -843,22 +844,23 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
       }
       // cloth->split_cloth_by_coord()
 
-      vector<int> coords;
+      // vector<int> coords;
       // coords.push_back(0);
-      coords.push_back(4);
-      coords.push_back(8);
-      coords.push_back(12);
-      coords.push_back(16);
-      coords.push_back(20);
-      coords.push_back(24);
-      coords.push_back(28);
+      // coords.push_back(4);
+      // coords.push_back(8);
+      // coords.push_back(12);
+      // coords.push_back(16);
+      // coords.push_back(20);
+      // coords.push_back(24);
+      // coords.push_back(28);
+      slice_coords_set->insert(16);
 
 
       for (Cloth *cloth : cloth_objects_queue) {
         // cloth->split_cloth(*cloth_objects);
         // cout << "here" << "\n";
 
-        cloth->split_cloth_by_coord(*cloth_objects, coords);
+        cloth->split_cloth_by_coord(*cloth_objects, *slice_coords_set);
       }
       // cout << '\n';
       //splitOnCollide();

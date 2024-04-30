@@ -2,6 +2,7 @@
 #define COLLISIONOBJECT_SPLITTER_H
 
 #include <nanogui/nanogui.h>
+#include <set>
 
 #include "../clothMesh.h"
 #include "collisionObject.h"

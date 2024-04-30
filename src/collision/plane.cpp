@@ -12,6 +12,7 @@ using namespace CGL;
 
 void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
   // TODO (Part 3): Handle collisions with planes.
+
   Vector3D point_to_curr = pm.position - point;
   Vector3D point_to_last = pm.last_position - point;
   double signed_dist_point_to_curr = dot(point_to_curr, normal);
@@ -39,6 +40,7 @@ void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
       }
     }
     if (signed_dist_point_to_curr < 0) {
+
       correction_vector =
           (tangent_point - pm.last_position) + SURFACE_OFFSET * normal;
     } else {
@@ -48,6 +50,8 @@ void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
     collided = true;
     if (hidden) return;
     pm.position = pm.last_position + (1.0 - friction) * correction_vector;
+
+    cout << "HIT";
   }
 }
 

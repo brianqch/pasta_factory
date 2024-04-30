@@ -48,18 +48,27 @@ inline bool isPointWithinSquare(const Vector3D& normal, const Vector3f& point0, 
 }
 
 void Splitter::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
-      Vector3D point_to_curr = pm.position - point;
-  Vector3D point_to_last = pm.last_position - point;
-  double signed_dist_point_to_curr = dot(point_to_curr, normal);
-  double signed_dist_point_to_last = dot(point_to_last, normal);
-  // check for sign change by multiplying and see if < 0
-  if (signed_dist_point_to_last * signed_dist_point_to_curr <= 0) {
+  // cout << planeX;
+  double planeX = point.x;
+  double floorX = floor(planeX * 1000) / 1000;
 
-    if (!isHitSplitter) {
-        isHitSplitter = true;
-        cout << "HIT: " << isHitSplitter << "\n";
-    }
+  if (pm.position.x == floorX) {
+    // slice_coords_set.insert(floorX);
   }
+  
+  
+  //     Vector3D point_to_curr = pm.position - point;
+  // Vector3D point_to_last = pm.last_position - point;
+  // double signed_dist_point_to_curr = dot(point_to_curr, normal);
+  // double signed_dist_point_to_last = dot(point_to_last, normal);
+  // // check for sign change by multiplying and see if < 0
+  // if (signed_dist_point_to_last * signed_dist_point_to_curr <= 0) {
+
+  //   if (!isHitSplitter) {
+  //       isHitSplitter = true;
+  //       cout << "HIT: " << isHitSplitter << "\n";
+  //   }
+  // }
 }
 
 void Splitter::render(GLShader &shader) {
