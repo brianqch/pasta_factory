@@ -132,7 +132,6 @@ void Cloth::buildGrid() {
     }
   }
 }
-//random comment
 
 void Cloth::simulate(double frames_per_sec, double simulation_steps,
                      ClothParameters *cp,
