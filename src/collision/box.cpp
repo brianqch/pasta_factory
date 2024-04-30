@@ -144,19 +144,19 @@ Box::Box(Vector3D center, float dist, double friction, double cloth_width) {
 }
 
 void Box::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set) {
-    // plane1.collide(pm, isBeltMoving, isHitSplitter);
-    // plane2.collide(pm, isBeltMoving, isHitSplitter);
-    // plane3.collide(pm, isBeltMoving, isHitSplitter);
-    // plane4.collide(pm, isBeltMoving, isHitSplitter);
-    // plane5.collide(pm, isBeltMoving, isHitSplitter);
-    // plane6.collide(pm, isBeltMoving, isHitSplitter);
-    cut1.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
-    cut2.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    // plane1.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    // plane2.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    // plane3.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    // plane4.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    // plane5.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    // plane6.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    // cut1.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    // cut2.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
     cut3.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set); 
     cut4.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
     cut5.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
-    cut6.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
-    cut7.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    // cut6.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    // cut7.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
     if (plane5.collided && plane6.collided) {
         // cout << "hit";
         isHitSplitter = true;

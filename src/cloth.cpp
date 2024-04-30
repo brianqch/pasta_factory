@@ -581,6 +581,7 @@ void Cloth::create_cloth(double width, double height, int num_width_points, int 
   newCloth->build_springs();
   newCloth->buildClothMesh();
   cloth_objects.push_back(newCloth);
+
   cout << "pushed \n";
 
 
@@ -609,13 +610,14 @@ void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, std::set<float> 
   int firsthalf = 0;
   int secondhalf = 0;
 
+  // cout << "BUCKET MAP 2 SIZE: " << bucket_map[2]->size() << "\n";
   // Turn set into list
   vector<float> coords(slice_coords_set.begin(), slice_coords_set.end());
   std::sort(coords.begin(), coords.end());
 
   for (PointMass &pm : point_masses) {
     float pmX = pm.position.x;
-    PointMass new_pm(pm.position + Vector3D(0, 0.0005, 0), pm.pinned);
+    PointMass new_pm(pm.position + Vector3D(0, 0.0001, 0), pm.pinned);
     new_pm.last_position = pm.last_position;
     new_pm.forces = pm.forces;
 
@@ -689,7 +691,10 @@ void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, std::set<float> 
     // cout << interval_size << "\n";
 
     // Add the new cloth objects to the cloth_objects vector
-    float prev = 0.0;
+
+    // Cloth width divide 2
+    float prev = -0.5;
+    coords.push_back(0.5);
 
     cout << bucket_map.size() << " IS THE BUCKET MAP SIZE \n";
 
@@ -700,16 +705,18 @@ void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, std::set<float> 
       // }
       // cout << num_width_points << " WIDHT \n";
       // cout << bucket_map[i]->size() << "BUCKET MAP SIZE";
-
+      cout << "LIGMA" << bucket_map[i]->size() << "\n";
       // Change width to how much is portioned
       create_cloth(abs(coords[i]-prev) * width, height, bucket_map[i]->size()/num_height_points, num_height_points, thickness, orientation, cloth_objects, *bucket_map[i]);
       prev = coords[i];
     }
 
-     auto it = find(cloth_objects.begin(), cloth_objects.end(), this);
+    auto it = find(cloth_objects.begin(), cloth_objects.end(), this);
     if (it != cloth_objects.end()) {
         cloth_objects.erase(it);
     }
+
+
 
 }
 

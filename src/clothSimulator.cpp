@@ -479,7 +479,7 @@ void ClothSimulator::globalCollision(Cloth* cloth) {
         obj->collide(pm, *isBeltMoving, *isHitSplitter, *slice_coords_set);
         if (!completedSplit && *isHitSplitter) {
           completedSplit = true;
-          splitOnCollide();
+          cloth->split_cloth_by_coord(*cloth_objects, *slice_coords_set);
         }
 
         // cout << "Slice Coords Set Size: " << slice_coords_set->size() << "\n";
@@ -574,16 +574,16 @@ void ClothSimulator::drawWireframe(GLShader &shader, Cloth *cloth) {
 void ClothSimulator::splitOnCollide() {
 
 
-    for (int i = 0; i < 5; i++) {
-      vector<Cloth *> cloth_objects_queue;
+    // for (int i = 0; i < 5; i++) {
+    //   vector<Cloth *> cloth_objects_queue;
 
-      for (Cloth *cloth : *cloth_objects) {
-        cloth_objects_queue.push_back(cloth);
-      }
-      for (Cloth *cloth : cloth_objects_queue) {
-        cloth->split_cloth(*cloth_objects);
-      }
-    }
+    //   for (Cloth *cloth : *cloth_objects) {
+    //     cloth_objects_queue.push_back(cloth);
+    //   }
+    //   for (Cloth *cloth : cloth_objects_queue) {
+    //     cloth->split_cloth(*cloth_objects);
+    //   }
+    // }
       // cout << cloth_objects->size();
 
       // cout << '\n';
