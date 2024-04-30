@@ -128,6 +128,6 @@ void Belt::render(GLShader &shader) {
   shader.drawArray(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void Belt::renderSlicers(GLShader &shader, int num_slicers) {
+void Belt::renderSlicers(GLShader &shader, int num_slicers, double slicerHeight) {
 
 }
