@@ -13,14 +13,14 @@ using namespace std;
 
 struct Box : public CollisionObject {
 public:
-  Box(Vector3D center, double dist, double friction);
+  Box(Vector3D center, float dist, double friction);
 
   void render(GLShader &shader); //do render /w ea of 6 planes
-  void collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter); //check collide w/ ea of 6 planes
+  void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter); //check collide w/ ea of 6 planes
   //2 planes phantom, don't render phantom planes (front one dont care, back one - split pasta)
 
   Vector3D center;
-  double dist;
+  float dist;
   double friction;
 
   Plane plane1;
@@ -29,6 +29,13 @@ public:
   Plane plane4;
   Plane plane5;
   Plane plane6;
+  Plane cut1;
+  Plane cut2;
+  Plane cut3;
+  Plane cut4;
+  Plane cut5;
+  Plane cut6;
+  Plane cut7;
   bool collided;
 };
 

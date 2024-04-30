@@ -203,6 +203,12 @@ ClothSimulator::~ClothSimulator() {
 
 void ClothSimulator::loadCloths(vector<Cloth *> *cloth_objects) {
   this->cloth_objects = cloth_objects;
+
+
+  this->default_cloth_objects = new vector<Cloth *>();
+  for (Cloth* cloth : *cloth_objects) {
+    this->default_cloth_objects->push_back(new Cloth(*cloth));
+  }
 }
 
 void ClothSimulator::loadClothParameters(ClothParameters *cp) { this->cp = cp; }
@@ -296,8 +302,16 @@ void ClothSimulator::drawContents() {
 
   const UserShader &active_shader = shaders[active_shader_idx];
 
+  // cout << "Active SHader: " << active_shader_idx;
+
   GLShader &shader = *active_shader.nanogui_shader;
   shader.bind();
+
+  // Phong is index 6.
+  // Texture is index 7.
+  const UserShader &second_active_shader = shaders[6];
+  GLShader &obj_shader = *second_active_shader.nanogui_shader;
+  // obj_shader.bind();
 
   // Prepare the camera projection matrix
 
@@ -367,8 +381,41 @@ void ClothSimulator::drawContents() {
     }
     break;
   }
+  obj_shader.bind();
+
+
+  obj_shader.setUniform("u_model", model);
+  obj_shader.setUniform("u_view_projection", viewProjection);
 
   for (CollisionObject *co : *collision_objects) {
+      Vector3D cam_pos = camera.position();
+      obj_shader.setUniform("u_color", color, false);
+      obj_shader.setUniform("u_cam_pos", Vector3f(cam_pos.x, cam_pos.y, cam_pos.z),
+                        false);
+      obj_shader.setUniform("u_light_pos", Vector3f(0.5, 2, 2), false);
+      obj_shader.setUniform("u_light_intensity", Vector3f(3, 3, 3), false);
+      obj_shader.setUniform("u_texture_1_size",
+                        Vector2f(m_gl_texture_1_size.x, m_gl_texture_1_size.y),
+                        false);
+      obj_shader.setUniform("u_texture_2_size",
+                        Vector2f(m_gl_texture_2_size.x, m_gl_texture_2_size.y),
+                        false);
+      obj_shader.setUniform("u_texture_3_size",
+                        Vector2f(m_gl_texture_3_size.x, m_gl_texture_3_size.y),
+                        false);
+      obj_shader.setUniform("u_texture_4_size",
+                        Vector2f(m_gl_texture_4_size.x, m_gl_texture_4_size.y),
+                        false);
+      // Textures
+      obj_shader.setUniform("u_texture_1", 1, false);
+      obj_shader.setUniform("u_texture_2", 2, false);
+      obj_shader.setUniform("u_texture_3", 3, false);
+      obj_shader.setUniform("u_texture_4", 4, false);
+
+      obj_shader.setUniform("u_normal_scaling", m_normal_scaling, false);
+      obj_shader.setUniform("u_height_scaling", m_height_scaling, false);
+
+      obj_shader.setUniform("u_texture_cubemap", 5, false);
     co->render(shader);
   }
 }
@@ -427,7 +474,7 @@ void ClothSimulator::globalCollision(Cloth* cloth) {
 
       // TODO (Part 3): Handle collisions with other primitives.
       for (CollisionObject *obj : *collision_objects) {
-        obj->collide(pm, isBeltMoving, *isHitSplitter);
+        obj->collide(pm, *isBeltMoving, *isHitSplitter);
         if (!completedSplit && *isHitSplitter) {
           completedSplit = true;
           splitOnCollide();
@@ -523,7 +570,7 @@ void ClothSimulator::drawWireframe(GLShader &shader, Cloth *cloth) {
 void ClothSimulator::splitOnCollide() {
 
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 5; i++) {
       vector<Cloth *> cloth_objects_queue;
 
       for (Cloth *cloth : *cloth_objects) {
@@ -755,12 +802,19 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
       break;
     case 'r':
     case 'R':
-      // cloth_objects->clear();
-      // cout << "Default cloth objects size: " << default_cloth_objects->size();
-      // cloth_objects = default_cloth_objects;
+      // for (Cloth *cloth : *cloth_objects) {
+      //   delete cloth; // Delete the cloth objects pointed to by the pointers in cloth_objects
+      // }
+      // cloth_objects->clear(); // Clear the vector itself
+
+      // Restore the original cloth objects from default_cloth_objects
+      // for (Cloth *cloth : *default_cloth_objects) {
+      //   cloth_objects->push_back(cloth); // Make deep copies and add them to cloth_objects
+      // }
       for (Cloth *cloth : *cloth_objects) {
         cloth->reset();
       }
+
       break;
     case ' ':
       resetCamera();
@@ -781,15 +835,15 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
     case 'S': {
       // cout << cloth_objects->size();
 
-      // vector<Cloth *> cloth_objects_queue;
+      vector<Cloth *> cloth_objects_queue;
 
-      // for (Cloth *cloth : *cloth_objects) {
-      //   cloth_objects_queue.push_back(cloth);
-      // }
+      for (Cloth *cloth : *cloth_objects) {
+        cloth_objects_queue.push_back(cloth);
+      }
 
-      // for (Cloth *cloth : cloth_objects_queue) {
-      //   cloth->split_cloth(*cloth_objects);
-      // }
+      for (Cloth *cloth : cloth_objects_queue) {
+        cloth->split_cloth(*cloth_objects);
+      }
       // cout << '\n';
       //splitOnCollide();
       break;
@@ -797,8 +851,8 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
     case 'b':
     case 'B': {
       // Move the conveyer belt.
-      isBeltMoving = !isBeltMoving;
-      cout << "Belt Moving: " << isBeltMoving;
+      *isBeltMoving = !(*isBeltMoving);
+      cout << "Belt Moving: " << *isBeltMoving << "\n";
       break;
     }
 

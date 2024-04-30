@@ -457,28 +457,35 @@ void Cloth::buildClothMesh() {
 }
 
 void Cloth::split_cloth(vector<Cloth*> &cloth_objects) {
-
   int midpoint;
+  orientation = VERTICAL;
   if (orientation == HORIZONTAL) {
       midpoint = num_height_points / 2;
   } else {
       midpoint = num_width_points / 2;
   }
 
+  // cout << "NUM WIDHT POINTS: " << num_width_points << "\n";
+
+  if (num_width_points == 2) {
+    return;
+  }
+
     // Split the cloth into two halves
     Cloth* cloth1 = new Cloth();
     Cloth* cloth2 = new Cloth();
 
+
     // Transfer properties from the original cloth
-    cloth1->width = width;
-    cloth1->height = height / 2.0;
+    cloth1->width = (orientation == VERTICAL) ? width /2 : width;
+    cloth1->height = (orientation == HORIZONTAL) ? height /2 : height;
     cloth1->num_width_points = (orientation == VERTICAL) ? num_width_points/2 : num_width_points;
     cloth1->num_height_points = (orientation == HORIZONTAL) ? num_height_points / 2 : num_height_points;
     cloth1->thickness = thickness;
     cloth1->orientation = orientation;
 
-    cloth2->width = width;
-    cloth2->height = height / 2.0;
+    cloth2->width = (orientation == VERTICAL) ? width /2 : width;
+    cloth2->height = (orientation == HORIZONTAL) ? height /2 : height;
     cloth2->num_width_points = (orientation == VERTICAL) ? num_width_points/2 : num_width_points;
     cloth2->num_height_points = (orientation == HORIZONTAL) ? num_height_points / 2 : num_height_points;
     cloth2->thickness = thickness;
@@ -494,19 +501,112 @@ void Cloth::split_cloth(vector<Cloth*> &cloth_objects) {
             PointMass& pm = point_masses[h * num_width_points + w];
             if (( orientation == HORIZONTAL && h < midpoint) || ( orientation == VERTICAL && w < midpoint)) {
                 // Assign this point mass to cloth1
-                PointMass new_pm(pm.position, pm.pinned);
+                PointMass new_pm(pm.position + Vector3D(0, 0.0001, 0), pm.pinned);
                 new_pm.last_position = pm.last_position;
                 new_pm.forces = pm.forces;
                 cloth1->point_masses.push_back(new_pm);
                 firsthalf++;
             } else {
                 // // Assign this point mass to cloth2
-                PointMass new_pm(pm.position, pm.pinned);
+                PointMass new_pm(pm.position + Vector3D(0, 0.0001, 0), pm.pinned);
                 new_pm.last_position = pm.last_position;
                 new_pm.forces = pm.forces;
                 cloth2->point_masses.push_back(new_pm);
                 secondhalf++;
             }
+
+            // cout << num_width_points; 
+        }
+    }
+
+    cout << "First half: " << firsthalf << "\n";
+    cout << "Second half: " << secondhalf << "\n";
+
+    // Build springs for the new cloth objects
+
+    cloth1->build_springs();
+    cloth2->build_springs();
+
+
+    // Add the new cloth objects to the cloth_objects vector
+    auto it = find(cloth_objects.begin(), cloth_objects.end(), this);
+    if (it != cloth_objects.end()) {
+        cloth_objects.erase(it);
+    }
+
+    cloth1->buildClothMesh();
+    cloth2->buildClothMesh();
+
+    cloth_objects.push_back(cloth1);
+    cloth_objects.push_back(cloth2);
+}
+
+
+void create_cloth(double width, double height, int num_width_points, int num_height_points, double thickness, e_orientation orientation) {
+  
+}
+
+
+void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, vector<float> coords) {
+  int midpoint;
+  orientation = VERTICAL;
+  if (orientation == HORIZONTAL) {
+      midpoint = num_height_points / 2;
+  } else {
+      midpoint = num_width_points / 2;
+  }
+
+  // cout << "NUM WIDHT POINTS: " << num_width_points << "\n";
+
+  if (num_width_points == 2) {
+    return;
+  }
+
+    // Split the cloth into two halves
+    Cloth* cloth1 = new Cloth();
+    Cloth* cloth2 = new Cloth();
+
+
+    // Transfer properties from the original cloth
+    cloth1->width = (orientation == VERTICAL) ? width /2 : width;
+    cloth1->height = (orientation == HORIZONTAL) ? height /2 : height;
+    cloth1->num_width_points = (orientation == VERTICAL) ? num_width_points/2 : num_width_points;
+    cloth1->num_height_points = (orientation == HORIZONTAL) ? num_height_points / 2 : num_height_points;
+    cloth1->thickness = thickness;
+    cloth1->orientation = orientation;
+
+    cloth2->width = (orientation == VERTICAL) ? width /2 : width;
+    cloth2->height = (orientation == HORIZONTAL) ? height /2 : height;
+    cloth2->num_width_points = (orientation == VERTICAL) ? num_width_points/2 : num_width_points;
+    cloth2->num_height_points = (orientation == HORIZONTAL) ? num_height_points / 2 : num_height_points;
+    cloth2->thickness = thickness;
+    cloth2->orientation = orientation;
+
+    
+  int firsthalf = 0;
+  int secondhalf = 0;
+  cout << "Orientation: " << orientation << "\n";
+  // Transfer point masses and their properties
+    for (int h = 0; h < num_height_points; h++) {
+        for (int w = 0; w < num_width_points; w++) {
+            PointMass& pm = point_masses[h * num_width_points + w];
+            if (( orientation == HORIZONTAL && h < midpoint) || ( orientation == VERTICAL && w < midpoint)) {
+                // Assign this point mass to cloth1
+                PointMass new_pm(pm.position + Vector3D(0, 0.0001, 0), pm.pinned);
+                new_pm.last_position = pm.last_position;
+                new_pm.forces = pm.forces;
+                cloth1->point_masses.push_back(new_pm);
+                firsthalf++;
+            } else {
+                // // Assign this point mass to cloth2
+                PointMass new_pm(pm.position + Vector3D(0, 0.0001, 0), pm.pinned);
+                new_pm.last_position = pm.last_position;
+                new_pm.forces = pm.forces;
+                cloth2->point_masses.push_back(new_pm);
+                secondhalf++;
+            }
+
+            // cout << num_width_points; 
         }
     }
 

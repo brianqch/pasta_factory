@@ -47,7 +47,7 @@ inline bool isPointWithinSquare(const Vector3D& normal, const Vector3f& point0, 
     return (dot0 >= 0 && dot1 >= 0 && dot2 >= 0 && dot3 >= 0);
 }
 
-void Splitter::collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter) {
+void Splitter::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
       Vector3D point_to_curr = pm.position - point;
   Vector3D point_to_last = pm.last_position - point;
   double signed_dist_point_to_curr = dot(point_to_curr, normal);

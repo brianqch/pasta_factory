@@ -72,7 +72,7 @@ private:
   ClothParameters *cp;
   vector<CollisionObject *> *collision_objects;
 
-  bool isBeltMoving = false;
+  bool *isBeltMoving = new bool(false);
   bool *isHitSplitter = new bool(false);
 
   // OpenGL attributes

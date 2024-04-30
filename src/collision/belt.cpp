@@ -47,7 +47,7 @@ inline bool isPointWithinSquare(const Vector3D& normal, const Vector3f& point0, 
     return (dot0 >= 0 && dot1 >= 0 && dot2 >= 0 && dot3 >= 0);
 }
 
-void Belt::collide(PointMass &pm, bool isBeltMoving, bool &isHitSplitter) {
+void Belt::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
   Vector3D point0_3D = Vector3D(point0.x(), point0.y(), point0.z());
   Vector3D point1_3D = Vector3D(point1.x(), point1.y(), point1.z());
   Vector3D point2_3D = Vector3D(point2.x(), point2.y(), point2.z());
@@ -100,11 +100,11 @@ void Belt::render(GLShader &shader) {
   // point1 += lengthScale * (point1 - point0);
   // point2 += lengthScale * (point2 - point3);
   // point3 += lengthScale * (point3 - point2);
-
-  point0 = sPoint + Vector3f(0.5, 0, 0.5+lengthScale);
-  point1 = sPoint + Vector3f(-0.5, 0, 0.5+lengthScale);
-  point2 = sPoint + Vector3f(0.5, 0, -0.5-lengthScale);
-  point3 = sPoint + Vector3f(-0.5, 0, -0.5-lengthScale);
+  float size = 0.6;
+  point0 = sPoint + Vector3f(size, 0, size+lengthScale);
+  point1 = sPoint + Vector3f(-size, 0, size+lengthScale);
+  point2 = sPoint + Vector3f(size, 0, -size-lengthScale);
+  point3 = sPoint + Vector3f(-size, 0, -size-lengthScale);
   positions.col(0) << point0;
   positions.col(1) << point1;
   positions.col(2) << point2;

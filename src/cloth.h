@@ -56,6 +56,9 @@ struct Cloth {
   void reset();
   void buildClothMesh();
   void split_cloth(vector<Cloth*> &cloth_objects);
+
+  void split_cloth_by_coord(vector<Cloth*> &cloth_objects, vector<float> coords);
+  void create_cloth(double width, double height, int num_width_points, int num_height_points, double thickness, e_orientation orientation);
   void build_springs();
 
   void build_spatial_map();

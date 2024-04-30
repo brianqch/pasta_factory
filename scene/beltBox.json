@@ -9,20 +9,20 @@
       "orientation": 0,
       "width": 1,
       "height": 1,
-      "num_width_points": 50,
-      "num_height_points": 50,
+      "num_width_points": 32,
+      "num_height_points": 32,
       "thickness": 0.0095,
-      "xOffset": [-0.45],
-      "yOffset": [0.0],
-      "zOffset": [0.6]
+      "xOffset": [-0.5],
+      "yOffset": [-0.5],
+      "zOffset": [0.62]
     },
     "box": {
         "center": [0, 0, 0],
-        "dist": 1,
+        "dist": 1.2,
         "friction": 0.5
     },
     "belt": {
-        "point": [0, -0.45, 0],
+        "point": [0, -0.55, 0],
         "normal": [0, 1, 0],
         "friction": 0.5
       }
