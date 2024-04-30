@@ -840,9 +840,24 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
       for (Cloth *cloth : *cloth_objects) {
         cloth_objects_queue.push_back(cloth);
       }
+      // cloth->split_cloth_by_coord()
+
+      vector<int> coords;
+      // coords.push_back(0);
+      coords.push_back(4);
+      coords.push_back(8);
+      coords.push_back(12);
+      coords.push_back(16);
+      coords.push_back(20);
+      coords.push_back(24);
+      coords.push_back(28);
+
 
       for (Cloth *cloth : cloth_objects_queue) {
-        cloth->split_cloth(*cloth_objects);
+        // cloth->split_cloth(*cloth_objects);
+        // cout << "here" << "\n";
+
+        cloth->split_cloth_by_coord(*cloth_objects, coords);
       }
       // cout << '\n';
       //splitOnCollide();

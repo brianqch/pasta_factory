@@ -1,4 +1,4 @@
-# Install script for directory: /Users/brianq/cs184/final/ext/nanogui
+# Install script for directory: /Users/jefforee/Documents/Berkeley/cs184/pasta_factory/ext/nanogui
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,12 +34,12 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/Library/Developer/CommandLineTools/usr/bin/objdump")
+  set(CMAKE_OBJDUMP "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/objdump")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/Users/brianq/cs184/final/build/ext/nanogui/ext_build/glfw/cmake_install.cmake")
+  include("/Users/jefforee/Documents/Berkeley/cs184/pasta_factory/build/ext/nanogui/ext_build/glfw/cmake_install.cmake")
 
 endif()
 

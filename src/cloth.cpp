@@ -247,6 +247,21 @@ void Cloth::build_spatial_map() {
   }
 }
 
+void Cloth::build_bucket_map(vector<int> coords) {
+  for (const auto &entry : map) {
+    delete (entry.second);
+  }
+  bucket_map.clear();
+
+  // TODO (Part 4): Build a spatial map out of all of the point masses.
+
+  for (int i = 0; i <= coords.size(); i ++) {
+    if (!bucket_map[i]) {
+      bucket_map[i] = new vector<PointMass>();
+    }
+  }
+}
+
 void Cloth::self_collide(PointMass &pm, double simulation_steps) {
   // TODO (Part 4): Handle self-collision for a given point mass.
   float hashedPosition = hash_position(pm.position);
@@ -542,94 +557,117 @@ void Cloth::split_cloth(vector<Cloth*> &cloth_objects) {
 }
 
 
-void create_cloth(double width, double height, int num_width_points, int num_height_points, double thickness, e_orientation orientation) {
-  
+void Cloth::create_cloth(double width, double height, int num_width_points, int num_height_points, double thickness, e_orientation orientation, vector<Cloth*> &cloth_objects, vector<PointMass > pms) {
+  Cloth* newCloth = new Cloth();
+
+  newCloth->width = width;
+  newCloth->height = height;
+  newCloth->num_width_points = num_width_points;
+  newCloth->num_height_points = num_height_points;
+  newCloth->thickness = thickness;
+  newCloth->orientation = orientation;
+
+  cout << "Width: " << width << "\n";
+  cout << "Num Width Points: " << num_width_points << "\n";
+
+  // newCloth->point_masses = pms;
+  for (PointMass pm : pms) {
+    // cout << pm->position << "\n";
+    newCloth->point_masses.push_back(pm);
+  }
+  cout << "done \n";
+
+  newCloth->build_springs();
+  newCloth->buildClothMesh();
+  cloth_objects.push_back(newCloth);
+  cout << "pushed \n";
+
+
 }
 
 
-void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, vector<float> coords) {
-  int midpoint;
-  orientation = VERTICAL;
-  if (orientation == HORIZONTAL) {
-      midpoint = num_height_points / 2;
-  } else {
-      midpoint = num_width_points / 2;
+void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, vector<int> coords) {
+  // check if coord splits are valid
+  for (int coord: coords) {
+    if (coord < 0 || coord > num_width_points) {
+      return;
+    }
   }
 
-  // cout << "NUM WIDHT POINTS: " << num_width_points << "\n";
-
+  build_bucket_map(coords);
+  
   if (num_width_points == 2) {
     return;
   }
 
-    // Split the cloth into two halves
-    Cloth* cloth1 = new Cloth();
-    Cloth* cloth2 = new Cloth();
+  int interval_size = coords.size();
 
-
-    // Transfer properties from the original cloth
-    cloth1->width = (orientation == VERTICAL) ? width /2 : width;
-    cloth1->height = (orientation == HORIZONTAL) ? height /2 : height;
-    cloth1->num_width_points = (orientation == VERTICAL) ? num_width_points/2 : num_width_points;
-    cloth1->num_height_points = (orientation == HORIZONTAL) ? num_height_points / 2 : num_height_points;
-    cloth1->thickness = thickness;
-    cloth1->orientation = orientation;
-
-    cloth2->width = (orientation == VERTICAL) ? width /2 : width;
-    cloth2->height = (orientation == HORIZONTAL) ? height /2 : height;
-    cloth2->num_width_points = (orientation == VERTICAL) ? num_width_points/2 : num_width_points;
-    cloth2->num_height_points = (orientation == HORIZONTAL) ? num_height_points / 2 : num_height_points;
-    cloth2->thickness = thickness;
-    cloth2->orientation = orientation;
-
-    
   int firsthalf = 0;
   int secondhalf = 0;
-  cout << "Orientation: " << orientation << "\n";
-  // Transfer point masses and their properties
+ 
+
     for (int h = 0; h < num_height_points; h++) {
         for (int w = 0; w < num_width_points; w++) {
             PointMass& pm = point_masses[h * num_width_points + w];
-            if (( orientation == HORIZONTAL && h < midpoint) || ( orientation == VERTICAL && w < midpoint)) {
-                // Assign this point mass to cloth1
-                PointMass new_pm(pm.position + Vector3D(0, 0.0001, 0), pm.pinned);
-                new_pm.last_position = pm.last_position;
-                new_pm.forces = pm.forces;
-                cloth1->point_masses.push_back(new_pm);
-                firsthalf++;
-            } else {
-                // // Assign this point mass to cloth2
-                PointMass new_pm(pm.position + Vector3D(0, 0.0001, 0), pm.pinned);
-                new_pm.last_position = pm.last_position;
-                new_pm.forces = pm.forces;
-                cloth2->point_masses.push_back(new_pm);
-                secondhalf++;
-            }
+            PointMass new_pm(pm.position + Vector3D(0, 0.0001, 0), pm.pinned);
+            new_pm.last_position = pm.last_position;
+            new_pm.forces = pm.forces;
 
-            // cout << num_width_points; 
+            int bucket_start = 0;
+            // for (int i = 0; i < coords.size(); i++) {
+            //     cout << coords[i] << "\n";
+            // }
+            
+            for (int i = 0; i < coords.size(); i++) {
+              if (bucket_start <= w && w < coords[i]) {
+                // cout << "Bucket 0 New Pos Pushed: " << new_pm.position << "\n";
+                bucket_map[i]->push_back(new_pm);
+                // cout << "bucket 0" << "\n";
+                firsthalf += 1;
+                break;
+              }
+              bucket_start = coords[i];
+            }
+            if (w >= coords[coords.size()-1]) {
+              // cout << "bucket 1" << "\n";
+              // cout << "Bucket 1 New Pos Pushed: " << new_pm.position << "\n";
+              secondhalf += 1;
+              bucket_map[coords.size()]->push_back(new_pm);
+            }
+         
         }
     }
 
-    cout << "First half: " << firsthalf << "\n";
-    cout << "Second half: " << secondhalf << "\n";
 
-    // Build springs for the new cloth objects
-
-    cloth1->build_springs();
-    cloth2->build_springs();
-
+    // for (int j = 0; j <  bucket_map[0]->size(); j++) {
+    //     cout << "BALS" << (*bucket_map[0])[j]->position << "\n";
+    // }
+    interval_size += 1;
+    // cout << "First half: " << firsthalf << "\n";
+    // cout << "Second half: " << secondhalf << "\n";
+    // cout << interval_size << "\n";
 
     // Add the new cloth objects to the cloth_objects vector
-    auto it = find(cloth_objects.begin(), cloth_objects.end(), this);
+    float prev = 0.0;
+
+    for (int i = 0; i < bucket_map.size(); i++) {
+      // cout << bucket_map[i]->size() << " bucket size \n";
+      // for (int j = 0; j <  bucket_map[i]->size(); j++) {
+      //   // cout << (*bucket_map[i])[j]->position << "\n";
+      // }
+      cout << num_width_points << " WIDHT \n";
+      cout << bucket_map[i]->size()/num_height_points << "dasdasd";
+
+      // Change width to how much is portioned
+      create_cloth(abs(coords[i]-prev)/num_width_points * width, height, bucket_map[i]->size()/num_height_points, num_height_points, thickness, orientation, cloth_objects, *bucket_map[i]);
+      prev = coords[i];
+    }
+
+     auto it = find(cloth_objects.begin(), cloth_objects.end(), this);
     if (it != cloth_objects.end()) {
         cloth_objects.erase(it);
     }
 
-    cloth1->buildClothMesh();
-    cloth2->buildClothMesh();
-
-    cloth_objects.push_back(cloth1);
-    cloth_objects.push_back(cloth2);
 }
 
 void Cloth::build_springs() {

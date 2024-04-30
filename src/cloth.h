@@ -57,13 +57,15 @@ struct Cloth {
   void buildClothMesh();
   void split_cloth(vector<Cloth*> &cloth_objects);
 
-  void split_cloth_by_coord(vector<Cloth*> &cloth_objects, vector<float> coords);
-  void create_cloth(double width, double height, int num_width_points, int num_height_points, double thickness, e_orientation orientation);
+  void split_cloth_by_coord(vector<Cloth*> &cloth_objects, vector<int> coords);
+  void create_cloth(double width, double height, int num_width_points, int num_height_points, double thickness, e_orientation orientation, vector<Cloth*> &cloth_objects,  vector<PointMass > pms);
   void build_springs();
 
   void build_spatial_map();
+  void build_bucket_map(vector<int> coords);
   void self_collide(PointMass &pm, double simulation_steps);
   float hash_position(Vector3D pos);
+
 
   // Cloth properties
   double width;
@@ -85,6 +87,7 @@ struct Cloth {
 
   // Spatial hashing
   unordered_map<float, vector<PointMass *> *> map;
+  unordered_map<float, vector<PointMass > *> bucket_map;
 };
 
 #endif /* CLOTH_H */
