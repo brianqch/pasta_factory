@@ -47,13 +47,14 @@ inline bool isPointWithinSquare(const Vector3D& normal, const Vector3f& point0, 
     return (dot0 >= 0 && dot1 >= 0 && dot2 >= 0 && dot3 >= 0);
 }
 
-void Splitter::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
+void Splitter::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set) {
   // cout << planeX;
   double planeX = point.x;
   double floorX = floor(planeX * 1000) / 1000;
 
   if (pm.position.x == floorX) {
-    // slice_coords_set.insert(floorX);
+    slice_coords_set.insert(floorX);
+    
   }
   
   

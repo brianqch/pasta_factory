@@ -2,6 +2,7 @@
 #define COLLISIONOBJECT_BOX_H
 
 #include <nanogui/nanogui.h>
+#include <set>
 
 #include "../clothMesh.h"
 #include "collisionObject.h"
@@ -13,16 +14,17 @@ using namespace std;
 
 struct Box : public CollisionObject {
 public:
-  Box(Vector3D center, float dist, double friction);
+  Box(Vector3D center, float dist, double friction, double cloth_width);
 
   void render(GLShader &shader); //do render /w ea of 6 planes
-  void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter); //check collide w/ ea of 6 planes
+  void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set); //check collide w/ ea of 6 planes
   //2 planes phantom, don't render phantom planes (front one dont care, back one - split pasta)
   void renderSlicers(GLShader &shader, int num_slicers);
 
   Vector3D center;
   float dist;
   double friction;
+  double cloth_width;
 
   Plane plane1;
   Plane plane2;

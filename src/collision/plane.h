@@ -2,6 +2,7 @@
 #define COLLISIONOBJECT_PLANE_H
 
 #include <nanogui/nanogui.h>
+#include <set>
 
 #include "../clothMesh.h"
 #include "collisionObject.h"
@@ -17,7 +18,7 @@ public:
       : point(point), normal(normal.unit()), friction(friction), manualRender(manualrender), hidden(hidden)  {}
 
   void render(GLShader &shader);
-  void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter);
+  void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set);
   void renderSlicers(GLShader &shader, int num_slicers);
 
   Vector3D point;

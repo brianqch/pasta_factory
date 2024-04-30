@@ -4,21 +4,50 @@
 #include "../clothMesh.h"
 #include "../clothSimulator.h"
 #include "plane.h"
+#include <set>
+
 
 using namespace std;
 using namespace CGL;
 
 #define SURFACE_OFFSET 0.0001
 
-void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
-  // TODO (Part 3): Handle collisions with planes.
+void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set) {
+  double planeX = point.x;
+  // double floorX = floor(planeX * 100.00) / 100.00;
 
+  // double pmFloorX = floor(pm.position.x * 100.000) / 100.00;
+
+  // Same value as in beltBox.json
+  // float dist = 1.0;
+  // num_width_points / 2 to get left and right amount of values
+  // float numWidthPtsHalf = 16;
+
+  // cout << "FLOOR X: " << floorX << "\n";
+
+  // Error is width / num_width_points
+  float error = 1.0 / 32.0;
+  if (planeX - error <= pm.position.x && pm.position.x <= planeX + error) {
+    // cout << pmFloorX << "\n";
+    // float splitOffset = pmFloorX >= 0 ? 1.2 / 8: -1.2 / 8;
+    float coord = planeX;
+
+    // cout << "Coord: " << coord << "\n";
+
+    slice_coords_set.insert(coord);
+  }
+
+
+  
+  // TODO (Part 3): Handle collisions with planes.
   Vector3D point_to_curr = pm.position - point;
   Vector3D point_to_last = pm.last_position - point;
   double signed_dist_point_to_curr = dot(point_to_curr, normal);
   double signed_dist_point_to_last = dot(point_to_last, normal);
   // check for sign change by multiplying and see if < 0
   if (signed_dist_point_to_last * signed_dist_point_to_curr <= 0) {
+    // cout << "INSIDE COLLIDE \n"; 
+
     Vector3D tangent_point = pm.position - normal.unit() * signed_dist_point_to_curr;
     Vector3D correction_vector;
     if (manualRender) { //in manualRender, if a collision occurs outside the face's bounding box - don't adjust w/ correction vectorwe
@@ -40,6 +69,7 @@ void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
       }
     }
     if (signed_dist_point_to_curr < 0) {
+
 
       correction_vector =
           (tangent_point - pm.last_position) + SURFACE_OFFSET * normal;

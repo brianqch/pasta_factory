@@ -1,5 +1,6 @@
 #include "iostream"
 #include <nanogui/nanogui.h>
+#include <set>
 
 #include "../clothMesh.h"
 #include "../clothSimulator.h"
@@ -18,7 +19,7 @@ inline Vector3f toVector3f(const Vector3D &vec3d) {
                     static_cast<float>(vec3d.z)};
 }
 
-Box::Box(Vector3D center, float dist, double friction) {
+Box::Box(Vector3D center, float dist, double friction, double cloth_width) {
     this->center = center;
     this->dist = dist;
     this->friction = friction;
@@ -71,7 +72,7 @@ Box::Box(Vector3D center, float dist, double friction) {
     plane6.corner3 = toVector3f(point6) + Vector3f(-dist/2, -dist/2, 0);
     plane6.corner4 = toVector3f(point6) + Vector3f(dist/2, -dist/2, 0);
 
-    Vector3D point7 = Vector3D(center.x-3*(dist/8), center.y, center.z);
+    Vector3D point7 = Vector3D(center.x-3*(cloth_width/8), center.y, center.z);
     Vector3D normal7 = (center - point7).unit();
     cut1 = Plane(point7, normal7, friction, true);
     cut1.corner1 = toVector3f(point7) + Vector3f(0, dist/2, -dist/2);
@@ -79,7 +80,7 @@ Box::Box(Vector3D center, float dist, double friction) {
     cut1.corner3 = toVector3f(point7) + Vector3f(0, -dist/2, -dist/2);
     cut1.corner4 = toVector3f(point7) + Vector3f(0, -dist/2, dist/2);
 
-    Vector3D point8 = Vector3D(center.x-2*(dist/8), center.y, center.z);
+    Vector3D point8 = Vector3D(center.x-2*(cloth_width/8), center.y, center.z);
     Vector3D normal8 = (center - point8).unit();
     cut2 = Plane(point8, normal8, friction, true);
     cut2.corner1 = toVector3f(point8) + Vector3f(0, dist/2, -dist/2);
@@ -87,7 +88,7 @@ Box::Box(Vector3D center, float dist, double friction) {
     cut2.corner3 = toVector3f(point8) + Vector3f(0, -dist/2, -dist/2);
     cut2.corner4 = toVector3f(point8) + Vector3f(0, -dist/2, dist/2);
 
-    Vector3D point9 = Vector3D(center.x-dist/8, center.y, center.z);
+    Vector3D point9 = Vector3D(center.x-cloth_width/8, center.y, center.z);
     Vector3D normal9 = (center - point9).unit();
     cut3 = Plane(point9, normal9, friction, true);
     cut3.corner1 = toVector3f(point9) + Vector3f(0, dist/2, -dist/2);
@@ -103,7 +104,7 @@ Box::Box(Vector3D center, float dist, double friction) {
     cut4.corner3 = toVector3f(point10)+ Vector3f(0, -dist/2, -dist/2);
     cut4.corner4 = toVector3f(point10) + Vector3f(0, -dist/2, dist/2);
 
-    Vector3D point11 = Vector3D(center.x+dist/8, center.y, center.z);
+    Vector3D point11 = Vector3D(center.x+cloth_width/8, center.y, center.z);
     Vector3D normal11 = (center - point11).unit();
     cut5 = Plane(point11, normal11, friction, true);
     cut5.corner1 = toVector3f(point11) + Vector3f(0, dist/2, -dist/2);
@@ -111,7 +112,7 @@ Box::Box(Vector3D center, float dist, double friction) {
     cut5.corner3 = toVector3f(point11) + Vector3f(0, -dist/2, -dist/2);
     cut5.corner4 = toVector3f(point11) + Vector3f(0, -dist/2, dist/2);
 
-    Vector3D point12 = Vector3D(center.x+2*(dist/8), center.y, center.z);
+    Vector3D point12 = Vector3D(center.x+2*(cloth_width/8), center.y, center.z);
     Vector3D normal12 = (center - point12).unit();
     cut6 = Plane(point12, normal12, friction, true);
     cut6.corner1 = toVector3f(point12) + Vector3f(0, dist/2, -dist/2);
@@ -119,23 +120,43 @@ Box::Box(Vector3D center, float dist, double friction) {
     cut6.corner3 = toVector3f(point12) + Vector3f(0, -dist/2, -dist/2);
     cut6.corner4 = toVector3f(point12) + Vector3f(0, -dist/2, dist/2);
 
-    Vector3D point13 = Vector3D(center.x+3*(dist/8), center.y, center.z);
+    Vector3D point13 = Vector3D(center.x+3*(cloth_width/8), center.y, center.z);
     Vector3D normal13 = (center - point13).unit();
     cut7 = Plane(point13, normal13, friction, true);
     cut7.corner1 = toVector3f(point13) + Vector3f(0, dist/2, -dist/2);
     cut7.corner2 = toVector3f(point13) + Vector3f(0, dist/2, dist/2);
     cut7.corner3 = toVector3f(point13) + Vector3f(0, -dist/2, -dist/2);
     cut7.corner4 = toVector3f(point13) + Vector3f(0, -dist/2, dist/2);
+
+    // vector<Plane> cuts;
+
+    // cuts.push_back(cut1);
+    // cuts.push_back(cut2);
+    // cuts.push_back(cut3);
+    // cuts.push_back(cut4);
+    // cuts.push_back(cut5);
+    // cuts.push_back(cut6);
+    // cuts.push_back(cut7);
+
+    // for (int i = 0; i < cuts.size(); i++) {
+    //     cout << "Slicer " <<  i << "'s Position: " << cuts[i].point.x << "\n";
+    // }
 }
 
-void Box::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter) {
-    plane1.collide(pm, isBeltMoving, isHitSplitter);
-    plane2.collide(pm, isBeltMoving, isHitSplitter);
-    plane3.collide(pm, isBeltMoving, isHitSplitter);
-    plane4.collide(pm, isBeltMoving, isHitSplitter);
-    plane5.collide(pm, isBeltMoving, isHitSplitter);
-    plane6.collide(pm, isBeltMoving, isHitSplitter);
-    cut4.collide(pm, isBeltMoving, isHitSplitter);
+void Box::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set) {
+    // plane1.collide(pm, isBeltMoving, isHitSplitter);
+    // plane2.collide(pm, isBeltMoving, isHitSplitter);
+    // plane3.collide(pm, isBeltMoving, isHitSplitter);
+    // plane4.collide(pm, isBeltMoving, isHitSplitter);
+    // plane5.collide(pm, isBeltMoving, isHitSplitter);
+    // plane6.collide(pm, isBeltMoving, isHitSplitter);
+    cut1.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    cut2.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    cut3.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set); 
+    cut4.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    cut5.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    cut6.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
+    cut7.collide(pm, isBeltMoving, isHitSplitter, slice_coords_set);
     if (plane5.collided && plane6.collided) {
         // cout << "hit";
         isHitSplitter = true;

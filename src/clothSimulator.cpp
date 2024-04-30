@@ -476,11 +476,13 @@ void ClothSimulator::globalCollision(Cloth* cloth) {
 
       // TODO (Part 3): Handle collisions with other primitives.
       for (CollisionObject *obj : *collision_objects) {
-        obj->collide(pm, *isBeltMoving, *isHitSplitter);
+        obj->collide(pm, *isBeltMoving, *isHitSplitter, *slice_coords_set);
         if (!completedSplit && *isHitSplitter) {
           completedSplit = true;
           splitOnCollide();
         }
+
+        // cout << "Slice Coords Set Size: " << slice_coords_set->size() << "\n";
       }
     }
   // for (Cloth* cloth : *cloth_objects){
@@ -582,7 +584,7 @@ void ClothSimulator::splitOnCollide() {
         cloth->split_cloth(*cloth_objects);
       }
     }
-      cout << cloth_objects->size();
+      // cout << cloth_objects->size();
 
       // cout << '\n';
       // break;
@@ -853,7 +855,7 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
       // coords.push_back(20);
       // coords.push_back(24);
       // coords.push_back(28);
-      slice_coords_set->insert(16);
+      // slice_coords_set->insert(16);
 
 
       for (Cloth *cloth : cloth_objects_queue) {
@@ -1099,7 +1101,7 @@ new Label(window, "Slicers", "sans-bold");
     num_slicers_box->setFontSize(14);
     num_slicers_box->setValue(num_slicers);
     num_slicers_box->setSpinnable(true);
-    num_slicers_box->setMinValue(1);
+    num_slicers_box->setMinValue(0);
     num_slicers_box->setMaxValue(7);
     num_slicers_box->setCallback([this](int value) { num_slicers = value; });
 

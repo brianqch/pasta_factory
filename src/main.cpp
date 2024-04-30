@@ -563,7 +563,7 @@ bool loadObjectsFromFile(string filename, vector<Cloth *> * cloths, ClothParamet
     // } 
     else if (key == BOX) {
       Vector3D center;
-      double dist, friction;
+      double dist, friction, cloth_width;
 
       auto it_center = object.find("center");
       if (it_center != object.end()) {
@@ -587,7 +587,14 @@ bool loadObjectsFromFile(string filename, vector<Cloth *> * cloths, ClothParamet
         incompleteObjectError("box", "friction");
       }
 
-      Box *b = new Box(center, dist, friction);
+      auto it_cloth_width = object.find("cloth_width");
+      if (it_cloth_width != object.end()) {
+        cloth_width = *it_cloth_width;
+      } else {
+        incompleteObjectError("box", "cloth_width");
+      }
+
+      Box *b = new Box(center, dist, friction, cloth_width);
       objects->push_back(b);
     }
     else { // PLANE

@@ -67,7 +67,7 @@ private:
   int simulation_steps = 30;
 
   int num_slicers = 0;
-  std::set<int>* slice_coords_set = new std::set<int>;
+  std::set<float>* slice_coords_set = new std::set<float>;
 
 
   CGL::Vector3D gravity = CGL::Vector3D(0, -9.8, 0);

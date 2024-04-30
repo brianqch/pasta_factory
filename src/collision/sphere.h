@@ -4,6 +4,7 @@
 #include "../clothMesh.h"
 #include "../misc/sphere_drawing.h"
 #include "collisionObject.h"
+#include <set>
 
 using namespace CGL;
 using namespace std;
@@ -15,7 +16,7 @@ public:
         friction(friction), m_sphere_mesh(Misc::SphereMesh(num_lat, num_lon)) {}
 
   void render(GLShader &shader);
-  void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter);
+  void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set);
   void renderSlicers(GLShader &shader, int num_slicers);
 
 private:

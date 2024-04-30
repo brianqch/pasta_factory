@@ -248,7 +248,7 @@ void Cloth::build_spatial_map() {
   }
 }
 
-void Cloth::build_bucket_map(set<int> &slice_coords_set) {
+void Cloth::build_bucket_map(set<float> &slice_coords_set) {
   for (const auto &entry : map) {
     delete (entry.second);
   }
@@ -587,10 +587,13 @@ void Cloth::create_cloth(double width, double height, int num_width_points, int 
 }
 
 
-void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, std::set<int> &slice_coords_set) {
+void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, std::set<float> &slice_coords_set) {
+
+  // Dist of box divided by 2
+  float border = 0.6;
   // check if coord splits are valid
-  for (int coord: slice_coords_set) {
-    if (coord < 0 || coord > num_width_points) {
+  for (float coord: slice_coords_set) {
+    if (coord < -border|| coord > border) {
       return;
     }
   }
@@ -607,44 +610,74 @@ void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, std::set<int> &s
   int secondhalf = 0;
 
   // Turn set into list
-  vector<int> coords(slice_coords_set.begin(), slice_coords_set.end());
+  vector<float> coords(slice_coords_set.begin(), slice_coords_set.end());
   std::sort(coords.begin(), coords.end());
+
+  for (PointMass &pm : point_masses) {
+    float pmX = pm.position.x;
+    PointMass new_pm(pm.position + Vector3D(0, 0.0005, 0), pm.pinned);
+    new_pm.last_position = pm.last_position;
+    new_pm.forces = pm.forces;
+
+    float bucket_start = -border;
+    // for (int i = 0; i < coords.size(); i++) {
+    //     cout << coords[i] << "\n";
+    // }
+    
+    
+    for (int i = 0; i < coords.size(); i++) {
+      if (bucket_start <= pmX && pmX < coords[i]) {
+        // cout << "Bucket 0 New Pos Pushed: " << new_pm.position << "\n";
+        bucket_map[i]->push_back(new_pm);
+        // cout << "bucket 0" << "\n";
+        firsthalf += 1;
+        break;
+      }
+      bucket_start = coords[i];
+    }
+    if (pmX>= coords[coords.size()-1]) {
+      // cout << "bucket 1" << "\n";
+      // cout << "Bucket 1 New Pos Pushed: " << new_pm.position << "\n";
+      secondhalf += 1;
+      bucket_map[coords.size()]->push_back(new_pm);
+    }
+  }
  
 
-    for (int h = 0; h < num_height_points; h++) {
-        for (int w = 0; w < num_width_points; w++) {
-            PointMass& pm = point_masses[h * num_width_points + w];
-            PointMass new_pm(pm.position + Vector3D(0, 0.0001, 0), pm.pinned);
-            new_pm.last_position = pm.last_position;
-            new_pm.forces = pm.forces;
+    // for (int h = 0; h < num_height_points; h++) {
+    //     for (int w = 0; w < num_width_points; w++) {
+    //         PointMass& pm = point_masses[h * num_width_points + w];
+    //         PointMass new_pm(pm.position + Vector3D(0, 0.0001, 0), pm.pinned);
+    //         new_pm.last_position = pm.last_position;
+    //         new_pm.forces = pm.forces;
 
-            int bucket_start = 0;
-            // for (int i = 0; i < coords.size(); i++) {
-            //     cout << coords[i] << "\n";
-            // }
+    //         int bucket_start = 0;
+    //         // for (int i = 0; i < coords.size(); i++) {
+    //         //     cout << coords[i] << "\n";
+    //         // }
 
             
             
             
-            for (int i = 0; i < coords.size(); i++) {
-              if (bucket_start <= w && w < coords[i]) {
-                // cout << "Bucket 0 New Pos Pushed: " << new_pm.position << "\n";
-                bucket_map[i]->push_back(new_pm);
-                // cout << "bucket 0" << "\n";
-                firsthalf += 1;
-                break;
-              }
-              bucket_start = coords[i];
-            }
-            if (w >= coords[coords.size()-1]) {
-              // cout << "bucket 1" << "\n";
-              // cout << "Bucket 1 New Pos Pushed: " << new_pm.position << "\n";
-              secondhalf += 1;
-              bucket_map[coords.size()]->push_back(new_pm);
-            }
+    //         for (int i = 0; i < coords.size(); i++) {
+    //           if (bucket_start <= w && w < coords[i]) {
+    //             // cout << "Bucket 0 New Pos Pushed: " << new_pm.position << "\n";
+    //             bucket_map[i]->push_back(new_pm);
+    //             // cout << "bucket 0" << "\n";
+    //             firsthalf += 1;
+    //             break;
+    //           }
+    //           bucket_start = coords[i];
+    //         }
+    //         if (w >= coords[coords.size()-1]) {
+    //           // cout << "bucket 1" << "\n";
+    //           // cout << "Bucket 1 New Pos Pushed: " << new_pm.position << "\n";
+    //           secondhalf += 1;
+    //           bucket_map[coords.size()]->push_back(new_pm);
+    //         }
          
-        }
-    }
+    //     }
+    // }
 
 
     // for (int j = 0; j <  bucket_map[0]->size(); j++) {
@@ -658,16 +691,18 @@ void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, std::set<int> &s
     // Add the new cloth objects to the cloth_objects vector
     float prev = 0.0;
 
+    cout << bucket_map.size() << " IS THE BUCKET MAP SIZE \n";
+
     for (int i = 0; i < bucket_map.size(); i++) {
       // cout << bucket_map[i]->size() << " bucket size \n";
       // for (int j = 0; j <  bucket_map[i]->size(); j++) {
       //   // cout << (*bucket_map[i])[j]->position << "\n";
       // }
-      cout << num_width_points << " WIDHT \n";
-      cout << bucket_map[i]->size()/num_height_points << "dasdasd";
+      // cout << num_width_points << " WIDHT \n";
+      // cout << bucket_map[i]->size() << "BUCKET MAP SIZE";
 
       // Change width to how much is portioned
-      create_cloth(abs(coords[i]-prev)/num_width_points * width, height, bucket_map[i]->size()/num_height_points, num_height_points, thickness, orientation, cloth_objects, *bucket_map[i]);
+      create_cloth(abs(coords[i]-prev) * width, height, bucket_map[i]->size()/num_height_points, num_height_points, thickness, orientation, cloth_objects, *bucket_map[i]);
       prev = coords[i];
     }
 
