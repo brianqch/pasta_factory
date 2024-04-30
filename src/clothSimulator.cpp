@@ -1131,10 +1131,11 @@ new Label(window, "Slicers", "sans-bold");
     percentage->setFontSize(14);
     
 
-    slider->setCallback([percentage](float value) {
-      percentage->setValue(std::to_string(value)); // fix
+    slider->setCallback([percentage, this](float value) {
+      cp->slicerHeight = (double)value;
+      percentage->setValue(std::to_string(value));
     });
-    slider->setFinalCallback([&](float value) { //fix
+    slider->setFinalCallback([&](float value) {
       cp->slicerHeight = (double)value;
       // cout << "Final slider value: " << (int)(value * 100) << endl;
     });
