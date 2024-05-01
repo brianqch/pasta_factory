@@ -127,9 +127,9 @@ void SphereMesh::build_data() {
     positions.col(i + 1) << p2.x, p2.y, p2.z, 1.0;
     positions.col(i + 2) << p3.x, p3.y, p3.z, 1.0;
 
-    normals.col(i    ) << n1.x, n1.y, n1.z, 0.0;
-    normals.col(i + 1) << n2.x, n2.y, n2.z, 0.0;
-    normals.col(i + 2) << n3.x, n3.y, n3.z, 0.0;
+    normals.col(i    ) << -n1.x, -n1.y, -n1.z, 0.0;
+    normals.col(i + 1) << -n2.x, -n2.y, -n2.z, 0.0;
+    normals.col(i + 2) << -n3.x, -n3.y, -n3.z, 0.0;
     
     uvs.col(i    ) << uv1.x, uv1.y;
     uvs.col(i + 1) << uv2.x, uv2.y;
@@ -147,7 +147,6 @@ void SphereMesh::draw_sphere(GLShader &shader, const Vector3D &p, double r) {
   model << r, 0, 0, p.x, 0, r, 0, p.y, 0, 0, r, p.z, 0, 0, 0, 1;
 
   shader.setUniform("u_model", model);
-
 
   shader.uploadAttrib("in_position", positions);
   if (shader.attrib("in_normal", false) != -1) {

@@ -258,9 +258,11 @@ void ClothSimulator::init() {
 
   // canonicalCamera is a copy used for view resets
 
-  camera.place(target, acos(c_dir.y), atan2(c_dir.x, c_dir.z), view_distance,
+  Vector3D cameraOffset = Vector3D(0, 0, -4);
+
+  camera.place(target +cameraOffset, acos(c_dir.y), atan2(c_dir.x, c_dir.z), view_distance,
                min_view_distance, max_view_distance);
-  canonicalCamera.place(target, acos(c_dir.y), atan2(c_dir.x, c_dir.z),
+  canonicalCamera.place(target + Vector3D(0, 0, -5), acos(c_dir.y), atan2(c_dir.x, c_dir.z),
                         view_distance, min_view_distance, max_view_distance);
 
   screen_w = default_window_size(0);
@@ -310,7 +312,7 @@ void ClothSimulator::drawContents() {
 
   // Phong is index 6.
   // Texture is index 7.
-  const UserShader &second_active_shader = shaders[6];
+  const UserShader &second_active_shader = shaders[0];
   GLShader &obj_shader = *second_active_shader.nanogui_shader;
   // obj_shader.bind();
 
@@ -393,8 +395,8 @@ void ClothSimulator::drawContents() {
       obj_shader.setUniform("u_color", color, false);
       obj_shader.setUniform("u_cam_pos", Vector3f(cam_pos.x, cam_pos.y, cam_pos.z),
                         false);
-      obj_shader.setUniform("u_light_pos", Vector3f(0.5, 2, 2), false);
-      obj_shader.setUniform("u_light_intensity", Vector3f(3, 3, 3), false);
+      obj_shader.setUniform("u_light_pos", Vector3f(0.5, 3, -2), false);
+      obj_shader.setUniform("u_light_intensity", Vector3f(2, 2, 2), false);
       obj_shader.setUniform("u_texture_1_size",
                         Vector2f(m_gl_texture_1_size.x, m_gl_texture_1_size.y),
                         false);

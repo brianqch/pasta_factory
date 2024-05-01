@@ -61,7 +61,7 @@ void main() {
 
   
   out_color = texture(u_texture_1, v_uv);
-  out_color *= ka * Ia + kd * (I/r2) * max(0.0, dot(nd, l)) + ks * (I/r2) * pow(max(0.0, dot(nd, h_val)), p);
+  // out_color *= ka * Ia + kd * (I/r2) * max(0.0, dot(nd, l)) + ks * (I/r2) * pow(max(0.0, dot(nd, h_val)), p);
   // (Placeholder code. You will want to replace it.)
   // out_color = (vec4(1, 1, 1, 0) + v_normal) / 2;
   out_color.a = 1;

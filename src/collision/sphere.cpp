@@ -21,16 +21,16 @@ void Sphere::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set
     // Vector3D tangent_point = origin + unit_orgin_to_position * radius;
     // Vector3D correction_vector = tangent_point - pm.last_position;
     // pm.position = pm.last_position + (1.0 - friction) * correction_vector;
-    bool was_inside = last_distance < radius*0.82;
+    bool was_inside = last_distance < radius*0.9;
 
     // Check if the point mass is now outside the bowl
-    bool is_outside = distance >= radius*0.82;
+    bool is_outside = distance >= radius*0.9;
 
     // If the point mass was inside the bowl at the last time step but is now outside
     if (was_inside && is_outside) {
         //cout << "COLLISION" << endl;
         // Move the point mass back inside the bowl
-        Vector3D surface_point = origin + (1.0 - EPS_D) * unit_origin_to_position * radius * 0.82;
+        Vector3D surface_point = origin + (1.0 - EPS_D) * unit_origin_to_position * radius * (0.9);
         Vector3D correction_vector = surface_point - pm.last_position;
         //pm.position = pm.last_position + (1.0-friction) * correction_vector;
         pm.position =  pm.last_position +(1.0-friction)* correction_vector;
@@ -43,7 +43,7 @@ void Sphere::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set
 void Sphere::render(GLShader &shader) {
   // We decrease the radius here so flat triangles don't behave strangely
   // and intersect with the sphere when rendered
-  m_sphere_mesh.draw_sphere(shader, origin, radius * 0.92);
+  m_sphere_mesh.draw_sphere(shader, origin, radius);
 }
 
 void Sphere::renderSlicers(GLShader &shader, int num_slicers, double slicerHeight) {}

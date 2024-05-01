@@ -1,10 +1,9 @@
 #version 330
 
+uniform vec4 u_color;
 uniform vec3 u_cam_pos;
 uniform vec3 u_light_pos;
 uniform vec3 u_light_intensity;
-
-uniform vec4 u_color;
 
 uniform sampler2D u_texture_2;
 uniform vec2 u_texture_2_size;
