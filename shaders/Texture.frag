@@ -34,7 +34,7 @@ void main() {
 
   float ka = 0.1;
   float kd = 0.8;
-  float ks = 0.01;
+  float ks = 0.6;
 
   float Ia = 1.0;
   float p = 32.0;

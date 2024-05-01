@@ -354,8 +354,8 @@ void ClothSimulator::drawContents() {
       shader.setUniform("u_color", color, false);
       shader.setUniform("u_cam_pos", Vector3f(cam_pos.x, cam_pos.y, cam_pos.z),
                         false);
-      shader.setUniform("u_light_pos", Vector3f(0.5, 2, 2), false);
-      shader.setUniform("u_light_intensity", Vector3f(3, 3, 3), false);
+      shader.setUniform("u_light_pos", Vector3f(0.5, 2, -2), false); // MOVE LIGHT WITH Z VALUE
+      shader.setUniform("u_light_intensity", Vector3f(10, 10, 10), false);
       shader.setUniform("u_texture_1_size",
                         Vector2f(m_gl_texture_1_size.x, m_gl_texture_1_size.y),
                         false);
@@ -476,10 +476,10 @@ void ClothSimulator::globalCollision(Cloth* cloth) {
 
       // TODO (Part 3): Handle collisions with other primitives.
       for (CollisionObject *obj : *collision_objects) {
-        obj->collide(pm, *isBeltMoving, *isHitSplitter, *slice_coords_set);
-        if (!completedSplit && *isHitSplitter) {
+        obj->collide(pm, *isBeltMoving, *isHitSplitter, *slice_coords_set, num_slicers);
+        if (!completedSplit && slice_coords_set->size() == num_slicers && *isHitSplitter) {
           completedSplit = true;
-          splitOnCollide();
+          cloth->split_cloth_by_coord(*cloth_objects, *slice_coords_set);
         }
 
         // cout << "Slice Coords Set Size: " << slice_coords_set->size() << "\n";
@@ -574,16 +574,16 @@ void ClothSimulator::drawWireframe(GLShader &shader, Cloth *cloth) {
 void ClothSimulator::splitOnCollide() {
 
 
-    for (int i = 0; i < 5; i++) {
-      vector<Cloth *> cloth_objects_queue;
+    // for (int i = 0; i < 5; i++) {
+    //   vector<Cloth *> cloth_objects_queue;
 
-      for (Cloth *cloth : *cloth_objects) {
-        cloth_objects_queue.push_back(cloth);
-      }
-      for (Cloth *cloth : cloth_objects_queue) {
-        cloth->split_cloth(*cloth_objects);
-      }
-    }
+    //   for (Cloth *cloth : *cloth_objects) {
+    //     cloth_objects_queue.push_back(cloth);
+    //   }
+    //   for (Cloth *cloth : cloth_objects_queue) {
+    //     cloth->split_cloth(*cloth_objects);
+    //   }
+    // }
       // cout << cloth_objects->size();
 
       // cout << '\n';
@@ -859,10 +859,10 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
 
 
       for (Cloth *cloth : cloth_objects_queue) {
-        // cloth->split_cloth(*cloth_objects);
+        cloth->split_cloth(*cloth_objects);
         // cout << "here" << "\n";
 
-        cloth->split_cloth_by_coord(*cloth_objects, *slice_coords_set);
+        // cloth->split_cloth_by_coord(*cloth_objects, *slice_coords_set);
       }
       // cout << '\n';
       //splitOnCollide();
@@ -1122,11 +1122,11 @@ new Label(window, "Slicers", "sans-bold");
     Slider *slider = new Slider(panel);
     slider->setValue(cp->slicerHeight); // fix
     slider->setFixedWidth(105);
-    slider->setRange(std::make_pair(-1.0, 1.0));
+    slider->setRange(std::make_pair(0.0, 1.0));
 
     TextBox *percentage = new TextBox(panel);
     percentage->setFixedWidth(75);
-    percentage->setValue("0"); //fix
+    percentage->setValue("0.5"); //fix
     //percentage->setUnits("%");
     percentage->setFontSize(14);
     

@@ -26,10 +26,10 @@ struct ClothParameters {
       : enable_structural_constraints(enable_structural_constraints),
         enable_shearing_constraints(enable_shearing_constraints),
         enable_bending_constraints(enable_bending_constraints),
-        damping(damping), density(density), ks(ks), slicerHeight(0.0) {}
+        damping(damping), density(density), ks(ks), slicerHeight(0.5) {}
   ~ClothParameters() {}
 
-  double slicerHeight;
+  double slicerHeight = 0.5;
 
   // Global simulation parameters
 

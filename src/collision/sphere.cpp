@@ -9,8 +9,8 @@
 using namespace nanogui;
 using namespace CGL;
 
-void Sphere::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set) {
-  //TODO (Part 3): Handle collisions with spheres.
+void Sphere::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set, int num_slicers) {
+  // TODO (Part 3): Handle collisions with spheres.
   Vector3D origin_to_position = (pm.position - origin);
   Vector3D unit_origin_to_position = origin_to_position.unit();
   double distance = origin_to_position.norm();
