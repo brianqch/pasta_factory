@@ -61,7 +61,7 @@ SphereMesh::SphereMesh(int num_lat, int num_lon)
     }
   }
 
-  for (int i = 0; i < sphere_num_lat; i++) {
+  for (int i = sphere_num_lat/2; i < sphere_num_lat; i++) {
     for (int j = 0; j < sphere_num_lon; j++) {
       unsigned int *iptr = &Indices[6 * (sphere_num_lon * i + j)];
 
