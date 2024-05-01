@@ -47,34 +47,77 @@ inline bool isPointWithinSquare(const Vector3D& normal, const Vector3f& point0, 
     return (dot0 >= 0 && dot1 >= 0 && dot2 >= 0 && dot3 >= 0);
 }
 
-void Splitter::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set) {
-  // cout << planeX;
+void Splitter::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set, int num_slicers) {
   double planeX = point.x;
-  double floorX = floor(planeX * 1000) / 1000;
+  double planeY = point.y;
+  // Error is width / num_width_points
+  float errorX = 1.0 / 32.0;
+  float errorY = 1.0 / 1000.0;
+  // cout << pm.position.y;
+  if (planeX - errorX <= pm.position.x && pm.position.x <= planeX + errorX) {
+    // cout << "Plane and Slicer Height: " << (planeY + slicerHeight) << "\n";
+    if ((planeY + slicerHeight) - 0.05 <= 0 && 0 <= (planeY + slicerHeight) + 0.05 ) {
+          // cout << pm.position.y << " PM POS \n";
 
-  if (pm.position.x == floorX) {
-    slice_coords_set.insert(floorX);
-    
+      if ((planeY + slicerHeight - 0.6000) - errorY<= pm.position.y && pm.position.y <= (planeY + slicerHeight -0.6000) + errorY ) {
+        isHitSplitter = true;
+        float coord = planeX;
+        // cout << "INSERTED INTO SET\n";
+        slice_coords_set.insert(coord);
+      }
+    }
   }
-  
-  
-  //     Vector3D point_to_curr = pm.position - point;
-  // Vector3D point_to_last = pm.last_position - point;
-  // double signed_dist_point_to_curr = dot(point_to_curr, normal);
-  // double signed_dist_point_to_last = dot(point_to_last, normal);
-  // // check for sign change by multiplying and see if < 0
-  // if (signed_dist_point_to_last * signed_dist_point_to_curr <= 0) {
 
-  //   if (!isHitSplitter) {
-  //       isHitSplitter = true;
-  //       cout << "HIT: " << isHitSplitter << "\n";
-  //   }
-  // }
+
+  Vector3D point_to_curr = pm.position - point;
+  Vector3D point_to_last = pm.last_position - point;
+  double signed_dist_point_to_curr = dot(point_to_curr, normal);
+  double signed_dist_point_to_last = dot(point_to_last, normal);
+  // check for sign change by multiplying and see if < 0
+  if (signed_dist_point_to_last * signed_dist_point_to_curr <= 0) {
+    // cout << "INSIDE COLLIDE \n"; 
+
+    Vector3D tangent_point = pm.position - normal.unit() * signed_dist_point_to_curr;
+    Vector3D correction_vector;
+    if (manualRender) { //in manualRender, if a collision occurs outside the face's bounding box - don't adjust w/ correction vectorwe
+      float min_x =
+          std::min({corner1.x(), corner2.x(), corner3.x(), corner4.x()});
+      float max_x =
+          std::max({corner1.x(), corner2.x(), corner3.x(), corner4.x()});
+      float min_y =
+          std::min({corner1.y(), corner2.y(), corner3.y(), corner4.y()}) + slicerHeight;
+      float max_y =
+          std::max({corner1.y(), corner2.y(), corner3.y(), corner4.y()}) + slicerHeight;
+      float min_z =
+          std::min({corner1.z(), corner2.z(), corner3.z(), corner4.z()});
+      float max_z =
+          std::max({corner1.z(), corner2.z(), corner3.z(), corner4.z()});
+      if (!(tangent_point.x >= min_x && tangent_point.x <= max_x && tangent_point.y >= min_y &&
+          tangent_point.y <= max_y && tangent_point.z >= min_z && tangent_point.z <= max_z)) {
+        return;
+      }
+    }
+    if (signed_dist_point_to_curr < 0) {
+
+
+      correction_vector =
+          (tangent_point - pm.last_position) + SURFACE_OFFSET * normal;
+    } else {
+      correction_vector =
+          (tangent_point - pm.last_position) - SURFACE_OFFSET * normal;
+    }
+    collided = true;
+    if (hidden) return;
+    pm.position = pm.last_position + (1.0 - friction) * correction_vector;
+
+    cout << "HIT";
+  }
 }
 
 void Splitter::render(GLShader &shader) {
-  nanogui::Color color(0.0f, 0.0f, 0.0f, 0.0f);
+  if (hidden) return;
 
+  nanogui::Color color(0.7f, 0.7f, 0.7f, 1.0f);
   Vector3f sPoint(point.x, point.y, point.z);
   Vector3f sNormal(normal.x, normal.y, normal.z);
   Vector3f sParallel(normal.y - normal.z, normal.z - normal.x,
@@ -84,22 +127,17 @@ void Splitter::render(GLShader &shader) {
 
   MatrixXf positions(3, 4);
   MatrixXf normals(3, 4);
-
-  float lengthScale = 0.2;
-  point0 = sPoint + 0.6 * (sCross + sParallel);
-  point1 = sPoint + 0.6 * (sCross - sParallel);
-  point2 = sPoint + 0.6 * (-sCross + sParallel);
-  point3 = sPoint + 0.6 * (-sCross - sParallel);
-
-  point0 += lengthScale * (point0 - point1);
-  point1 += lengthScale * (point1 - point0);
-  point2 += lengthScale * (point2 - point3);
-  point3 += lengthScale * (point3 - point2);
-
-  positions.col(0) << point0;
-  positions.col(1) << point1;
-  positions.col(2) << point2;
-  positions.col(3) << point3;
+  
+  positions.col(0) << sPoint + 2 * (sCross + sParallel);
+  positions.col(1) << sPoint + 2 * (sCross - sParallel);
+  positions.col(2) << sPoint + 2 * (-sCross + sParallel);
+  positions.col(3) << sPoint + 2 * (-sCross - sParallel);
+  if (manualRender) {
+    positions.col(0) << corner1 + Vector3f(0, slicerHeight, 0);
+    positions.col(1) << corner2 + Vector3f(0, slicerHeight, 0);
+    positions.col(2) << corner3 + Vector3f(0, slicerHeight, 0);
+    positions.col(3) << corner4 + Vector3f(0, slicerHeight, 0);
+  }
 
   normals.col(0) << sNormal;
   normals.col(1) << sNormal;
@@ -114,7 +152,7 @@ void Splitter::render(GLShader &shader) {
     shader.uploadAttrib("in_normal", normals);
   }
 
-//   shader.drawArray(GL_TRIANGLE_STRIP, 0, 4);
+  shader.drawArray(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void Splitter::renderSlicers(GLShader &shader, int num_slicers, double slicerHeight) {}

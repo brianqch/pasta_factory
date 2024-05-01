@@ -589,7 +589,9 @@ void Cloth::create_cloth(double width, double height, int num_width_points, int 
 
 
 void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, std::set<float> &slice_coords_set) {
-
+  if (slice_coords_set.empty()) {
+    return;
+  }
   // Dist of box divided by 2
   float border = 0.6;
   // check if coord splits are valid
@@ -693,8 +695,8 @@ void Cloth::split_cloth_by_coord(vector<Cloth*> &cloth_objects, std::set<float> 
     // Add the new cloth objects to the cloth_objects vector
 
     // Cloth width divide 2
-    float prev = -0.5;
-    coords.push_back(0.5);
+    float prev = -width/2;
+    coords.push_back(width/2);
 
     cout << bucket_map.size() << " IS THE BUCKET MAP SIZE \n";
 

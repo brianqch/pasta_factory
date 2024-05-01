@@ -12,8 +12,8 @@ using namespace CGL;
 
 #define SURFACE_OFFSET 0.0001
 
-void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set) {
-  double planeX = point.x;
+void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set, int num_slicers) {
+  // double planeX = point.x;
   // double floorX = floor(planeX * 100.00) / 100.00;
 
   // double pmFloorX = floor(pm.position.x * 100.000) / 100.00;
@@ -26,16 +26,16 @@ void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<
   // cout << "FLOOR X: " << floorX << "\n";
 
   // Error is width / num_width_points
-  float error = 1.0 / 32.0;
-  if (planeX - error <= pm.position.x && pm.position.x <= planeX + error) {
-    // cout << pmFloorX << "\n";
-    // float splitOffset = pmFloorX >= 0 ? 1.2 / 8: -1.2 / 8;
-    float coord = planeX;
+  // float error = 1.0 / 32.0;
+  // if (planeX - error <= pm.position.x && pm.position.x <= planeX + error) {
+  //   // cout << pmFloorX << "\n";
+  //   // float splitOffset = pmFloorX >= 0 ? 1.2 / 8: -1.2 / 8;
+  //   float coord = planeX;
 
-    // cout << "Coord: " << coord << "\n";
+  //   // cout << "Coord: " << coord << "\n";
 
-    slice_coords_set.insert(coord);
-  }
+  //   slice_coords_set.insert(coord);
+  // }
 
 
   
@@ -56,9 +56,9 @@ void Plane::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<
       float max_x =
           std::max({corner1.x(), corner2.x(), corner3.x(), corner4.x()});
       float min_y =
-          std::min({corner1.y(), corner2.y(), corner3.y(), corner4.y()}) + slicerHeight;
+          std::min({corner1.y(), corner2.y(), corner3.y(), corner4.y()});
       float max_y =
-          std::max({corner1.y(), corner2.y(), corner3.y(), corner4.y()}) + slicerHeight;
+          std::max({corner1.y(), corner2.y(), corner3.y(), corner4.y()});
       float min_z =
           std::min({corner1.z(), corner2.z(), corner3.z(), corner4.z()});
       float max_z =

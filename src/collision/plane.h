@@ -18,7 +18,7 @@ public:
       : point(point), normal(normal.unit()), friction(friction), manualRender(manualrender), hidden(hidden), slicerHeight(0.0)  {}
 
   void render(GLShader &shader);
-  void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set);
+  void collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set, int num_slicers);
   void renderSlicers(GLShader &shader, int num_slicers, double slicerHeight);
 
   Vector3D point;

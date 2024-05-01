@@ -49,7 +49,7 @@ inline bool isPointWithinSquare(const Vector3D& normal, const Vector3f& point0, 
     return (dot0 >= 0 && dot1 >= 0 && dot2 >= 0 && dot3 >= 0);
 }
 
-void Belt::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set) {
+void Belt::collide(PointMass &pm, bool &isBeltMoving, bool &isHitSplitter, set<float> &slice_coords_set, int num_slicers) {
   Vector3D point0_3D = Vector3D(point0.x(), point0.y(), point0.z());
   Vector3D point1_3D = Vector3D(point1.x(), point1.y(), point1.z());
   Vector3D point2_3D = Vector3D(point2.x(), point2.y(), point2.z());
